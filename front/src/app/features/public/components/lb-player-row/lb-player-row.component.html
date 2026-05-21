@@ -1,0 +1,57 @@
+  <!-- Rang + badge delta -->
+  <td class="w-[60px] text-center text-3xl font-bold py-2 rounded-l-2xl relative"
+      [class]="rankTextColor">
+    {{ rank }}
+    @if (showBadge() && rankDelta() !== 0) {
+      <span class="absolute -top-3 -right-1 text-xs font-bold badge-fade"
+            [class]="rankDelta() > 0 ? 'text-green-400' : 'text-red-500'">
+        {{ rankDelta() > 0 ? '▲' : '▼' }}{{ rankDelta() > 0 ? rankDelta() : -rankDelta() }}
+      </span>
+    }
+  </td>
+
+  <!-- Avatar + Nom -->
+  <td class="py-2 w-fit">
+    <div class="flex items-center gap-4">
+      <span class="h-14 aspect-square rounded-full border-4 bg-cover bg-center flex-shrink-0"
+            [class]="borderColor"
+            [style]="'background-image: url(' + (player.avatarUrl || '/images/user.png') + ')'">
+      </span>
+      <span class="text-white text-2xl font-bold inline-block max-w-[250px] truncate whitespace-nowrap">
+        {{ player.name }}
+      </span>
+    </div>
+  </td>
+
+  <!-- Grade -->
+  <td class="py-2 px-2 w-fit">
+    <div class="flex justify-center text-yellow-400 text-lg whitespace-nowrap">
+      {{ grade }}
+    </div>
+  </td>
+
+  <!-- Stats -->
+  <td class="py-2 px-2">
+    <div class="flex gap-3 text-sm flex-wrap">
+      <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 whitespace-nowrap">
+        🏆 {{ player.wins }}
+      </span>
+      <span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 whitespace-nowrap">
+        ❌ {{ player.losses }}
+      </span>
+      @if (lastMatch) {
+        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 flex items-center gap-2 max-w-[200px]">
+          <span>⏱</span>
+          <span class="inline-block truncate whitespace-nowrap overflow-hidden">
+            {{ lastMatch }}
+          </span>
+        </span>
+      }
+    </div>
+  </td>
+
+  <!-- ELO -->
+  <td class="w-min text-right text-4xl font-extrabold py-2 rounded-r-2xl pr-6 whitespace-nowrap transition-colors duration-300"
+      [class]="[eloTextColor, eloAnimClass()]">
+    {{ displayElo() }}
+  </td>

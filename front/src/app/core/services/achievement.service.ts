@@ -18,4 +18,8 @@ export class AchievementService {
   manualUnlock(playerId: number, key: string): Observable<void> {
     return this.api.post<void>(`/achievements/player/${playerId}/unlock`, { key });
   }
+
+  getGrades(): Observable<{ key: string; name: string; icon: string; threshold: number }[]> {
+    return this.api.get('/achievements/grades');
+  }
 }

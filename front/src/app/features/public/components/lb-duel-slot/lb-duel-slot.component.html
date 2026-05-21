@@ -1,0 +1,52 @@
+<div class="relative grid min-[546px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]
+            max-[545px]:grid-rows-[1fr_auto_1fr]
+            bg-[#2a1747] items-center w-full rounded-2xl px-4 py-2 min-h-0"
+     [class]="slotClass"
+     [style]="!slot.ongoing ? 'border: 1px solid rgba(74,222,128,.7)' : ''">
+
+  <!-- Pulse si en cours -->
+  @if (slot.ongoing) {
+    <div class="absolute inset-0 rounded-2xl animate-pulse pointer-events-none border-2 border-cyan-400"
+         style="box-shadow: 0 0 15px #22d3ee"></div>
+  }
+
+  <!-- Équipe 1 -->
+  <div class="h-full flex flex-col justify-around py-1 min-w-0">
+    @for (player of slot.team1; track player.name) {
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="shrink-0 max-[643px]:hidden aspect-square rounded-full bg-cover bg-center border-2"
+             [class]="getBorderColor(player.win)"
+             [style]="'height: min(90%, 60px); background-image: url(' + (player.avatar || '/images/user.png') + ')'">
+        </div>
+        <span class="font-bold whitespace-nowrap overflow-hidden text-ellipsis min-w-0 block"
+              [class]="[getTextColor(player.win), getFontSize()]">
+          {{ player.name }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <!-- VS -->
+  <span class="text-purple-300 px-3 shrink-0 text-center"
+        [class]="slot.ongoing ? 'font-extrabold text-2xl' : 'font-bold text-lg'"
+        [style]="slot.ongoing ? 'filter: drop-shadow(0 0 10px #a855f7)' : ''">
+    VS
+  </span>
+
+  <!-- Équipe 2 -->
+  <div class="h-full flex flex-col justify-around py-1 min-w-0 items-end">
+    @for (player of slot.team2; track player.name) {
+      <div class="flex items-center gap-2 min-w-0 justify-end">
+        <span class="font-bold whitespace-nowrap overflow-hidden text-ellipsis min-w-0 block text-right"
+              [class]="[getTextColor(player.win), getFontSize()]">
+          {{ player.name }}
+        </span>
+        <div class="shrink-0 max-[643px]:hidden aspect-square rounded-full bg-cover bg-center border-2"
+             [class]="getBorderColor(player.win)"
+             [style]="'height: min(90%, 60px); background-image: url(' + (player.avatar || '/images/user.png') + ')'">
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

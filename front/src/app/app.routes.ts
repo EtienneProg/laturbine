@@ -9,6 +9,11 @@ export const routes: Routes = [
       .then(m => m.LoginComponent),
   },
   {
+    path: 'public/leaderboard',
+    loadComponent: () => import('./features/public/public-leaderboard.component')
+      .then(m => m.PublicLeaderboardComponent),
+  },
+  {
     path: '',
     component: AdminLayoutComponent,
     canActivate: [authGuard],
