@@ -1,0 +1,33 @@
+@use "tailwindcss";
+
+@use './styles/variables' as *;
+@use './styles/neon' as *;
+@use './styles/animations' as *;
+
+@theme {
+  --color-neon:    #00f5ff;
+  --color-purple:  #bf5fff;
+  --color-green:   #00ff88;
+  --color-orange:  #ff6b35;
+  --color-danger:  #ff3b5c;
+  --color-muted:   #6b6b8a;
+  --color-card:    #12121a;
+  --color-border:  #1e1e2e;
+
+  --font-family-display: 'Orbitron', monospace;
+  --font-family-body:    'Inter', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #0a0a0f;
+  color: #e0e0ff;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+

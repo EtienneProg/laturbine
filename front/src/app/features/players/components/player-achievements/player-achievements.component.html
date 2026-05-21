@@ -1,0 +1,113 @@
+<div class="bg-card border border-border rounded-2xl p-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="font-display text-sm text-neon tracking-widest uppercase">
+      🏆 Achievements
+    </h2>
+    <span class="font-display text-xs text-muted">
+      {{ unlockedCount }} / {{ achievements.length }}
+    </span>
+  </div>
+
+  <!-- Filtres par catégorie -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    <button (click)="activeCategory.set('ALL')"
+            class="px-3 py-1.5 rounded-lg font-display text-xs tracking-wide transition-all"
+            [class]="activeCategory() === 'ALL'
+              ? 'bg-neon/20 border border-neon/60 text-neon'
+              : 'bg-bg border border-border text-muted hover:border-neon/30 hover:text-white'">
+      Tous
+    </button>
+    @for (group of groups; track group.category) {
+      <button (click)="activeCategory.set(group.category)"
+              class="px-3 py-1.5 rounded-lg font-display text-xs tracking-wide transition-all"
+              [class]="activeCategory() === group.category
+                ? 'bg-neon/20 border border-neon/60 text-neon'
+                : 'bg-bg border border-border text-muted hover:border-neon/30 hover:text-white'">
+        {{ group.icon }} {{ group.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Groupes d'achievements -->
+  @for (group of filtered; track group.category) {
+    <div class="mb-6 last:mb-0">
+      <h3 class="font-display text-xs text-muted uppercase tracking-widest mb-3">
+        {{ group.icon }} {{ group.label }}
+      </h3>
+
+      <div class="grid grid-cols-1 gap-2">
+        @for (a of group.items; track a.id) {
+          <div class="flex items-center gap-4 p-3 rounded-xl border transition-all"
+               [class]="a.unlocked
+                 ? 'bg-neon/5 border-neon/30'
+                 : 'bg-bg border-border opacity-70'">
+
+            <!-- Icône -->
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border"
+                 [class]="a.unlocked ? 'bg-neon/10 border-neon/30' : 'bg-border/20 border-border'">
+              {{ a.unlocked ? a.icon : '🔒' }}
+            </div>
+
+            <!-- Infos -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="font-body text-sm font-semibold"
+                      [class]="a.unlocked ? 'text-white' : 'text-muted'">
+                  {{ a.name }}
+                </span>
+                @if (a.unlocked) {
+                  <span class="px-2 py-0.5 rounded-full text-xs font-body bg-green/20 text-green border border-green/40">
+                    ✅ Débloqué
+                  </span>
+                }
+              </div>
+              <div class="text-muted text-xs font-body">{{ a.description }}</div>
+
+              <!-- Barre de progression -->
+              @if (a.threshold && !a.unlocked) {
+                <div class="mt-2">
+                  <div class="flex justify-between mb-1">
+                    <span class="text-xs font-body text-muted">{{ getProgressLabel(a) }}</span>
+                    <span class="text-xs font-body text-muted">{{ getProgressPercent(a) }}%</span>
+                  </div>
+                  <div class="h-1.5 bg-border rounded-full overflow-hidden">
+                    <div class="h-full rounded-full bg-neon transition-all duration-500"
+                         [style.width]="getProgressPercent(a) + '%'">
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Actions manuelles (isAuto = false) -->
+            @if (!a.isAuto && !a.unlocked) {
+              <div class="flex flex-col gap-1 flex-shrink-0">
+                @if (a.threshold) {
+                  <button (click)="increment.emit(a.key)"
+                          class="px-3 py-1 rounded-lg font-display text-xs bg-neon/10 border border-neon/40 text-neon hover:bg-neon/20 transition-all">
+                    +1
+                  </button>
+                } @else {
+                  <button (click)="unlock.emit(a.key)"
+                          class="px-3 py-1 rounded-lg font-display text-xs bg-green/10 border border-green/40 text-green hover:bg-green/20 transition-all">
+                    ✅
+                  </button>
+                }
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (achievements.length === 0) {
+    <p class="text-muted text-sm font-body text-center py-6">
+      Aucun achievement disponible
+    </p>
+  }
+
+</div>

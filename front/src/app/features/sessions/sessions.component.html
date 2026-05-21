@@ -1,0 +1,137 @@
+<div class="p-8">
+
+  <!-- Modal formulaire -->
+  @if (showForm()) {
+    <app-session-form
+      (create)="onCreate($event)"
+      (close)="showForm.set(false)"
+    />
+  }
+
+  <!-- Panel inscrits -->
+  @if (selectedSession()) {
+    <app-registrations-list
+      [session]="selectedSession()!"
+      (close)="selectedSession.set(null)"
+    />
+  }
+
+  <!-- Inscription manuelle  -->
+  @if (showManualRegister()) {
+    <app-manual-register-modal
+      [registrations]="selectedSessionForRegister()!.registrations"
+      (confirm)="onManualRegister($event)"
+      (close)="showManualRegister.set(false)"
+    />
+  }
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="font-display text-2xl font-bold text-neon drop-shadow-[0_0_16px_rgba(0,245,255,0.5)] tracking-wide">
+        📅 Sessions
+      </h1>
+      <p class="text-muted text-sm font-body mt-1">
+        {{ sessions().length }} sessions enregistrées
+      </p>
+    </div>
+    <button
+      (click)="showForm.set(true)"
+      class="cursor-pointer px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon transition-all"
+    >
+      + Nouvelle session
+    </button>
+  </div>
+
+  <!-- Loader -->
+  @if (loading()) {
+    <div class="flex items-center justify-center py-16">
+      <div class="w-8 h-8 border-2 border-neon border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else {
+
+    <!-- Session active -->
+    @if (activeSession) {
+      <div class="mb-8">
+        <h2 class="font-display text-xs text-green tracking-widest uppercase mb-4">
+          🟢 Session active
+        </h2>
+        <app-session-card
+          [session]="activeSession!"
+          (activate)="onActivate($event)"
+          (close)="onClose($event)"
+          (delete)="onDeleteRequest($event)"
+          (viewRegistrations)="viewRegistrations($event)"
+          (manualRegister)="onManualRegisterRequest($event)"
+        />
+      </div>
+    }
+
+    <!-- Popup confirmation suppression -->
+    @if (sessionToDelete()) {
+      <app-confirm-dialog
+        title="Supprimer la session"
+        [message]="'Es-tu sûr de vouloir supprimer la session du ' + (sessionToDelete()!.date | date:'dd/MM/yyyy') + ' ?'"
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        (confirm)="onDeleteConfirm()"
+        (cancel)="onDeleteCancel()"
+      />
+    }
+
+    <!-- Sessions ouvertes -->
+    @if (openSessions.length > 0) {
+      <div class="mb-8">
+        <h2 class="font-display text-xs text-neon tracking-widest uppercase mb-4">
+          Sessions ouvertes ({{ openSessions.length }})
+        </h2>
+        <div class="flex flex-col gap-3">
+          @for (session of openSessions; track session.id) {
+            <app-session-card
+              [session]="session"
+              (activate)="onActivate($event)"
+              (close)="onClose($event)"
+              (delete)="onDeleteRequest($event)"
+              (viewRegistrations)="viewRegistrations($event)"
+              (manualRegister)="onManualRegisterRequest($event)"
+            />
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Sessions terminées -->
+    @if (closedSessions.length > 0) {
+      <div>
+        <h2 class="font-display text-xs text-muted tracking-widest uppercase mb-4">
+          Terminées ({{ closedSessions.length }})
+        </h2>
+        <div class="flex flex-col gap-3">
+          @for (session of closedSessions; track session.id) {
+            <app-session-card
+              [session]="session"
+              (activate)="onActivate($event)"
+              (close)="onClose($event)"
+              (delete)="onDeleteRequest($event)"
+              (viewRegistrations)="viewRegistrations($event)"
+              (manualRegister)="onManualRegisterRequest($event)"
+            />
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Aucune session -->
+    @if (sessions().length === 0) {
+      <div class="bg-card border border-border rounded-2xl p-10 text-center">
+        <div class="text-4xl mb-4">📅</div>
+        <p class="text-white font-body font-semibold mb-2">Aucune session créée</p>
+        <p class="text-muted text-sm font-body">
+          Crée une session pour ouvrir les inscriptions Discord.
+        </p>
+      </div>
+    }
+
+  }
+
+</div>

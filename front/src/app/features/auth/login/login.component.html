@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-bg flex items-center justify-center">
+
+  <!-- Glow background -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-neon/5 blur-[120px]"></div>
+  </div>
+
+  <div class="relative w-full max-w-md px-6">
+
+    <!-- Logo -->
+    <div class="text-center mb-10">
+      <h1 class="font-display text-4xl font-black text-neon drop-shadow-[0_0_20px_rgba(0,245,255,0.6)] tracking-widest">
+        LA TURBINE
+      </h1>
+      <p class="text-muted text-sm font-body mt-2 tracking-widest uppercase">
+        Admin Dashboard
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-card border border-border rounded-2xl p-8 shadow-[0_0_40px_rgba(0,245,255,0.08)]">
+
+      <h2 class="font-display text-lg text-white mb-6 tracking-wide">
+        Connexion
+      </h2>
+
+      <div class="flex flex-col gap-4">
+
+        <!-- Password -->
+        <div>
+          <label class="block text-xs text-muted font-body uppercase tracking-widest mb-2">
+            Mot de passe
+          </label>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            (keyup.enter)="onSubmit()"
+            placeholder="••••••••"
+            class="w-full bg-bg border border-border rounded-xl px-4 py-3 text-white font-body text-sm outline-none focus:border-neon focus:shadow-[0_0_12px_rgba(0,245,255,0.2)] transition-all placeholder:text-muted"
+          />
+        </div>
+
+        <!-- Error -->
+        @if (error) {
+          <p class="text-danger text-sm font-body">{{ error }}</p>
+        }
+
+        <!-- Submit -->
+        <button
+          (click)="onSubmit()"
+          [disabled]="loading"
+          class="w-full mt-2 py-3 rounded-xl font-display text-sm tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          {{ loading ? 'CONNEXION...' : 'SE CONNECTER' }}
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</div>

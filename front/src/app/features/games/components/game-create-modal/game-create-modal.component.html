@@ -1,0 +1,90 @@
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-card border border-neon/30 rounded-2xl p-7 w-full max-w-2xl mx-4 shadow-[0_0_40px_rgba(0,245,255,0.1)] max-h-[90vh] overflow-y-auto">
+
+    <h2 class="font-display text-xl text-neon tracking-wide mb-6">🎮 LANCER UN JEU</h2>
+
+    @if (!selectedMode()) {
+      <!-- Sélection du mode -->
+      <p class="text-muted text-xs font-body uppercase tracking-widest mb-4">Choisis un mode de jeu</p>
+      <div class="grid grid-cols-1 gap-3">
+        @for (mode of gameModes; track mode.id) {
+          <button (click)="selectMode(mode)"
+                  class="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg hover:border-neon/40 hover:bg-neon/5 transition-all text-left">
+            <span class="text-3xl">{{ mode.icon }}</span>
+            <div>
+              <div class="font-display text-sm text-white tracking-wide">{{ mode.name }}</div>
+              <div class="text-muted text-xs font-body mt-1">{{ mode.description }}</div>
+            </div>
+            <span class="ml-auto text-muted text-xs font-body">
+              {{ mode.hasTeams ? mode.teamNames.join(' vs ') : 'Tous les inscrits' }}
+            </span>
+          </button>
+        }
+      </div>
+    } @else {
+      <!-- Sélection des équipes -->
+      <div class="flex items-center gap-3 mb-6">
+        <button (click)="selectedMode.set(null)"
+                class="text-muted hover:text-white transition-colors font-body text-sm">
+          ← Retour
+        </button>
+        <span class="text-lg">{{ selectedMode()!.icon }}</span>
+        <span class="font-display text-sm text-white">{{ selectedMode()!.name }}</span>
+      </div>
+
+      @if (selectedMode()!.hasTeams) {
+        <!-- Recherche -->
+        <div class="relative mb-4">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm">🔍</span>
+          <input type="text" [ngModel]="search()" (ngModelChange)="search.set($event)"
+                 placeholder="Rechercher un joueur..."
+                 class="w-full bg-bg border border-border rounded-xl pl-10 pr-4 py-2.5 text-white font-body text-sm outline-none focus:border-neon/60 transition-all placeholder:text-muted" />
+        </div>
+
+        <!-- Équipes -->
+        <div class="grid gap-4 mb-6" [style.grid-template-columns]="'repeat(' + selectedMode()!.teamNames.length + ', 1fr)'">
+          @for (teamName of selectedMode()!.teamNames; track teamName; let i = $index) {
+            <div>
+              <div class="text-xs uppercase tracking-widest mb-2 font-body" [class]="getTeamColor(i)">
+                {{ teamName }} ({{ getTeamCount(i) }})
+              </div>
+              <div class="bg-bg border rounded-xl overflow-hidden max-h-56 overflow-y-auto" [class]="getBorderColor(i)">
+                @for (reg of filteredPlayers(); track reg.playerId) {
+                  <div (click)="togglePlayer(i, reg.playerId)"
+                       class="flex items-center gap-2 px-3 py-2.5 border-b border-border last:border-b-0 border-l-4 transition-all"
+                       [class]="isInOtherTeam(i, reg.playerId)
+                         ? 'opacity-30 cursor-not-allowed border-l-transparent'
+                         : isInTeam(i, reg.playerId)
+                           ? getBgSelected(i) + ' cursor-pointer'
+                           : 'hover:bg-white/[0.02] cursor-pointer border-l-transparent'">
+                    <div class="w-2 h-2 rounded-full flex-shrink-0"
+                         [class]="isInTeam(i, reg.playerId) ? 'bg-current' : 'bg-border'"></div>
+                    <span class="font-body text-sm" [class]="isInTeam(i, reg.playerId) ? 'text-white font-semibold' : 'text-muted'">
+                      {{ reg.player.name }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-muted text-sm font-body mb-6 bg-bg border border-border rounded-xl p-4">
+          🏹 Tous les inscrits de la session participeront. Le gagnant sera désigné à la fin.
+        </p>
+      }
+
+      <div class="flex justify-end gap-3">
+        <button (click)="close.emit()"
+                class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-danger/10 border border-danger/60 text-danger hover:bg-danger/20 transition-all">
+          Annuler
+        </button>
+        <button (click)="onSubmit()" [disabled]="!canCreate()"
+                class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+          🎮 Lancer
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

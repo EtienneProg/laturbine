@@ -1,0 +1,220 @@
+<div class="p-8">
+
+  <!-- Loader -->
+  @if (loading()) {
+    <div class="flex items-center justify-center py-16">
+      <div class="w-8 h-8 border-2 border-neon border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  }
+
+  <!-- Modal edit ELO -->
+  @if (showEloEdit()) {
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="bg-card border border-green/30 rounded-2xl p-7 w-full max-w-sm mx-4 shadow-[0_0_40px_rgba(0,255,136,0.1)]">
+
+        <h2 class="font-display text-xl text-green tracking-wide mb-6">
+          ✏️ MODIFIER L'ELO
+        </h2>
+
+        <div class="mb-6">
+          <label class="block text-xs text-muted font-body uppercase tracking-widest mb-2">
+            Nouvel ELO
+          </label>
+          <input
+            type="number"
+            [ngModel]="newElo()"
+            (ngModelChange)="newElo.set($event)"
+            min="100"
+            class="w-full bg-bg border border-border rounded-xl px-4 py-3 text-white font-body text-sm outline-none focus:border-green/60 focus:shadow-[0_0_12px_rgba(0,255,136,0.15)] transition-all"
+          />
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button (click)="showEloEdit.set(false)"
+                  class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-danger/10 border border-danger/60 text-danger hover:bg-danger/20 transition-all">
+            Annuler
+          </button>
+          <button (click)="saveElo()"
+                  class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-green/10 border border-green/60 text-green hover:bg-green/20 hover:shadow-neon-green transition-all">
+            ✅ Sauvegarder
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  @if (!loading() && player()) {
+    <div class="flex justify-between items-center mb-2">
+      <!-- Back button -->
+      <button (click)="goBack()" class="flex items-center gap-2 text-muted text-sm font-body hover:text-neon transition-colors">
+        ← Retour aux joueurs
+      </button>
+      <button (click)="openEloEdit()"
+              class="px-4 py-1.5 rounded-xl font-display text-xs tracking-widest bg-green/10 border border-green/60 text-green hover:bg-green/20 transition-all">
+        ✏️ Modifier l'ELO
+      </button>
+    </div>
+
+
+    <!-- Header joueur -->
+    <div class="bg-card border border-border rounded-2xl p-6 mb-6 shadow-[0_0_30px_rgba(0,245,255,0.05)]">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+
+        <div class="flex items-center gap-5">
+          @if (player()!.avatarUrl) {
+            <img [src]="player()!.avatarUrl"
+                 [alt]="player()!.name"
+                 class="w-16 h-16 rounded-2xl border border-neon/30 object-cover" />
+          } @else {
+            <div class="w-16 h-16 rounded-2xl bg-neon/10 border border-neon/30
+              flex items-center justify-center
+              font-display text-2xl text-neon">
+              {{ player()!.name.charAt(0).toUpperCase() }}
+            </div>
+          }
+
+          <div>
+            <h1 class="font-display text-2xl font-bold text-white tracking-wide">
+              {{ player()!.name }}
+            </h1>
+            <p class="text-muted text-sm font-body mt-1">
+              {{ player()!.discordTag }}
+            </p>
+            <p class="text-muted text-xs font-body mt-0.5">
+              Membre depuis {{ player()!.createdAt | date:'MMMM yyyy' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- ELO badge -->
+        <div class="text-center">
+          <div class="font-display text-4xl font-black text-green drop-shadow-[0_0_16px_rgba(0,255,136,0.5)]">
+            {{ player()!.elo }}
+          </div>
+          <div class="text-muted text-xs font-body uppercase tracking-widest mt-1">
+            ELO
+          </div>
+          <div class="text-muted text-xs font-body mt-0.5">
+            Rang #{{ player()!.rank }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+      <div class="bg-card border border-border rounded-2xl p-5 hover:border-green/40 transition-all">
+        <div class="text-2xl mb-2">🏆</div>
+        <div class="font-display text-3xl font-bold text-green drop-shadow-[0_0_10px_rgba(0,255,136,0.4)]">
+          {{ player()!.wins }}
+        </div>
+        <div class="text-muted text-xs font-body mt-1 uppercase tracking-widest">
+          Victoires
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-2xl p-5 hover:border-danger/40 transition-all">
+        <div class="text-2xl mb-2">💀</div>
+        <div class="font-display text-3xl font-bold text-danger">
+          {{ player()!.losses }}
+        </div>
+        <div class="text-muted text-xs font-body mt-1 uppercase tracking-widest">
+          Défaites
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-2xl p-5 hover:border-neon/40 transition-all">
+        <div class="text-2xl mb-2">📊</div>
+        <div class="font-display text-3xl font-bold text-neon drop-shadow-[0_0_10px_rgba(0,245,255,0.4)]">
+          {{ winRate }}
+        </div>
+        <div class="text-muted text-xs font-body mt-1 uppercase tracking-widest">
+          Win Rate
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-2xl p-5 hover:border-purple/40 transition-all">
+        <div class="text-2xl mb-2">⚔️</div>
+        <div class="font-display text-3xl font-bold text-purple drop-shadow-[0_0_10px_rgba(191,95,255,0.4)]">
+          {{ player()!.wins + player()!.losses }}
+        </div>
+        <div class="text-muted text-xs font-body mt-1 uppercase tracking-widest">
+          Total duels
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Historique ELO -->
+    <div class="bg-card border border-border rounded-2xl p-6">
+      <h2 class="font-display text-sm text-neon tracking-widest uppercase mb-5">
+        📈 Historique ELO
+      </h2>
+
+      @if (player()!.eloHistory.length === 0) {
+        <p class="text-muted text-sm font-body text-center py-6">
+          Aucun historique disponible
+        </p>
+      } @else {
+        <div class="flex flex-col gap-0">
+          @for (entry of player()!.eloHistory; track entry.gameId) {
+            <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
+
+              <div class="flex items-center gap-3">
+                <!-- Delta indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-display"
+                     [class]="entry.delta >= 0
+                       ? 'bg-green/10 border border-green/30 text-green'
+                       : 'bg-danger/10 border border-danger/30 text-danger'">
+                  {{ entry.delta >= 0 ? '▲' : '▼' }}
+                </div>
+
+                <div>
+                  <div class="text-white text-sm font-body font-semibold">
+                    Duel #{{ entry.gameId }}
+                  </div>
+                  <div class="text-muted text-xs font-body">
+                    {{ entry.createdAt  | date:'dd/MM/yyyy HH:mm' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <div class="font-display text-sm font-bold"
+                     [class]="entry.delta >= 0 ? 'text-green' : 'text-danger'">
+                  {{ entry.delta >= 0 ? '+' : '' }}{{ entry.delta }}
+                </div>
+                <div class="text-muted text-xs font-body mt-0.5">
+                  → {{ entry.eloAfter }}
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <app-player-achievements
+      [achievements]="achievements()"
+      [playerId]="player()!.id"
+      (increment)="onIncrementAchievement($event)"
+      (unlock)="onUnlockAchievement($event)"
+    />
+  }
+
+  <!-- Joueur non trouvé -->
+  @if (!loading() && !player()) {
+    <div class="bg-card border border-border rounded-2xl p-10 text-center">
+      <div class="text-4xl mb-4">❓</div>
+      <p class="text-white font-body font-semibold mb-2">Joueur introuvable</p>
+      <button (click)="goBack()"
+              class="mt-4 px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 transition-all">
+        Retour
+      </button>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,53 @@
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-card border border-purple/30 rounded-2xl p-7 w-full max-w-md shadow-[0_0_40px_rgba(191,95,255,0.1)] mx-4">
+
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-display text-xl text-purple tracking-wide">
+        👥 INSCRITS
+      </h2>
+      <button (click)="close.emit()"
+              class="text-muted hover:text-white transition-colors font-display text-lg">
+        ✕
+      </button>
+    </div>
+
+    <p class="text-muted text-sm font-body mb-4">
+      Session du {{ session.date | date:'dd/MM/yyyy' }} —
+      <span class="text-purple">{{ session.registrations.length }} inscrits</span>
+    </p>
+
+    <div class="bg-bg border border-border rounded-xl overflow-hidden max-h-80 overflow-y-auto">
+
+      @if (session.registrations.length === 0) {
+        <p class="text-muted text-sm font-body text-center py-8">
+          Aucune inscription pour cette session
+        </p>
+      }
+
+      @for (reg of session.registrations; track reg.id; let i = $index) {
+        <div class="flex items-center justify-between px-4 py-3 border-b border-border last:border-0">
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded-lg bg-purple/10 border border-purple/30 flex items-center justify-center font-display text-xs text-purple">
+              {{ i + 1 }}
+            </div>
+            <span class="text-white text-sm font-body font-semibold">
+              {{ reg.player.name }}
+            </span>
+          </div>
+          <span class="text-muted text-xs font-body">
+            {{ reg.registeredAt | date:'HH:mm' }}
+          </span>
+        </div>
+      }
+
+    </div>
+
+    <div class="flex justify-end mt-6">
+      <button (click)="close.emit()"
+              class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-purple/10 border border-purple/60 text-purple hover:bg-purple/20 transition-all">
+        Fermer
+      </button>
+    </div>
+
+  </div>
+  </div>

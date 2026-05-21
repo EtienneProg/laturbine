@@ -1,0 +1,32 @@
+<div class="bg-card border border-border rounded-2xl p-6">
+  <h2 class="font-display text-sm text-neon tracking-widest uppercase mb-4">
+    Activité récente
+  </h2>
+
+  @if (duels.length === 0) {
+    <p class="text-muted text-sm font-body text-center py-6">
+      Aucun duel pour le moment
+    </p>
+  }
+
+  @for (duel of duels; track duel.id) {
+    <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
+      <div>
+        <div class="text-white text-sm font-body">
+          {{ getTeamNames(duel, 0) }}
+          <span class="text-muted mx-1">vs</span>
+          {{ getTeamNames(duel, 1) }}
+        </div>
+        <div class="text-muted text-xs mt-0.5">
+          {{ duel.createdAt | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+      </div>
+
+      <span [class]="duel.status === 'FINISHED'
+        ? 'px-3 py-1 rounded-full text-xs font-body bg-muted/20 text-muted border border-muted/40'
+        : 'px-3 py-1 rounded-full text-xs font-body bg-orange/20 text-orange border border-orange/40'">
+        {{ duel.status === 'FINISHED' ? '✅ Terminé' : '🔥 En cours' }}
+      </span>
+    </div>
+  }
+</div>

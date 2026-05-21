@@ -1,0 +1,65 @@
+<div class="bg-card border rounded-2xl p-5 transition-all"
+     [class]="duel.status === 'ONGOING'
+       ? 'border-orange/40 shadow-[0_0_20px_rgba(255,107,53,0.1)]'
+       : 'border-border'">
+
+  <div class="flex items-center gap-4 flex-wrap">
+
+    <div class="flex-1">
+      <div class="flex items-center gap-3 mb-4">
+        <span [class]="duel.status === 'ONGOING'
+          ? 'px-3 py-1 rounded-full text-xs font-body bg-orange/20 text-orange border border-orange/40'
+          : 'px-3 py-1 rounded-full text-xs font-body bg-muted/20 text-muted border border-muted/40'">
+          {{ duel.status === 'ONGOING' ? '🔥 En cours' : '✅ Terminé' }}
+        </span>
+        <span class="text-muted text-xs font-body">
+          {{ duel.createdAt | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4">
+
+        <div class="bg-neon/10 border border-neon/30 rounded-xl px-5 py-3 text-center min-w-[100px]">
+          @for (teamPlayer of duel.teams[0].players; track teamPlayer.id) {
+            <div class="font-body text-sm font-semibold"
+                 [class]="isWinner(0) ? 'text-green' : 'text-white'">
+              {{ teamPlayer.player.name }}
+            </div>
+          }
+          @if (isWinner(0)) {
+            <div class="text-green text-xs mt-1">🏆 Gagnant</div>
+          }
+        </div>
+
+        <div class="font-display text-lg font-black text-orange">VS</div>
+
+        <div class="bg-purple/10 border border-purple/30 rounded-xl px-5 py-3 text-center min-w-[100px]">
+          @for (teamPlayer of duel.teams[1].players; track teamPlayer.id) {
+            <div class="font-body text-sm font-semibold"
+                 [class]="isWinner(1) ? 'text-green' : 'text-white'">
+              {{ teamPlayer.player.name }}
+            </div>
+          }
+          @if (isWinner(1)) {
+            <div class="text-green text-xs mt-1">🏆 Gagnant</div>
+          }
+        </div>
+
+      </div>
+    </div>
+
+    @if (duel.status === 'ONGOING') {
+      <div class="flex flex-col gap-2">
+        <button (click)="onWinner(duel.teams[0].id)"
+                class="px-4 py-2 rounded-xl font-display text-xs tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon transition-all">
+          🏆 Éq. 1 gagne
+        </button>
+        <button (click)="onWinner(duel.teams[1].id)"
+                class="px-4 py-2 rounded-xl font-display text-xs tracking-widest bg-purple/10 border border-purple/60 text-purple hover:bg-purple/20 hover:shadow-neon-purple transition-all">
+          🏆 Éq. 2 gagne
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

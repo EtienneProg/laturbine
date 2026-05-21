@@ -1,0 +1,74 @@
+<div class="bg-card border rounded-2xl p-5 transition-all" [class]="borderClass">
+  <div class="flex items-center gap-4 flex-wrap">
+    <div class="flex-1">
+
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-lg">{{ game.gameMode.icon }}</span>
+        <span class="font-display text-sm text-white tracking-wide">{{ game.gameMode.name }}</span>
+        <span [class]="isOngoing
+          ? 'px-3 py-1 rounded-full text-xs font-body bg-orange/20 text-orange border border-orange/40'
+          : 'px-3 py-1 rounded-full text-xs font-body bg-muted/20 text-muted border border-muted/40'">
+          {{ isOngoing ? '🔥 En cours' : '✅ Terminé' }}
+        </span>
+        <span class="text-muted text-xs font-body ml-auto">
+          {{ game.createdAt | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+      </div>
+
+      <!-- Équipes -->
+      @if (game.teams.length > 0) {
+        <div class="flex items-center gap-4 flex-wrap">
+          @for (team of game.teams; track team.id; let i = $index) {
+            <div class="rounded-xl px-4 py-3 text-center min-w-[100px] border transition-all"
+                 [class]="isWinnerTeam(team.id)
+                   ? 'bg-green/10 border-green/40'
+                   : i === 0 ? 'bg-neon/10 border-neon/30' : 'bg-purple/10 border-purple/30'">
+              <div class="font-display text-xs mb-2 tracking-wide"
+                   [class]="i === 0 ? 'text-neon' : 'text-purple'">
+                {{ team.name }} ({{ team.players.length }})
+              </div>
+              @for (tp of team.players; track tp.id) {
+                <div class="font-body text-sm font-semibold"
+                     [class]="isWinnerTeam(team.id) ? 'text-green' : 'text-white'">
+                  {{ tp.player.name }}
+                </div>
+              }
+              @if (isWinnerTeam(team.id)) {
+                <div class="text-green text-xs mt-1 font-display">🏆 Gagnant</div>
+              }
+            </div>
+
+            @if (i < game.teams.length - 1) {
+              <div class="font-display text-lg font-black text-orange">VS</div>
+            }
+          }
+        </div>
+      }
+
+      <!-- ELO changes pour les duels -->
+      @if (game.eloHistory.length > 0 && !isOngoing) {
+        <div class="mt-3 flex flex-wrap gap-2">
+          @for (h of game.eloHistory; track h.id) {
+            <span class="px-2 py-1 rounded-lg text-xs font-display border"
+                  [class]="h.delta >= 0
+                    ? 'bg-green/10 border-green/30 text-green'
+                    : 'bg-danger/10 border-danger/30 text-danger'">
+              {{ h.player.name }} {{ h.delta >= 0 ? '+' : '' }}{{ h.delta }}
+            </span>
+          }
+        </div>
+      }
+
+    </div>
+
+    <!-- Bouton résultat -->
+    @if (isOngoing) {
+      <button (click)="setResult.emit(game)"
+              class="px-4 py-2 rounded-xl font-display text-xs tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon transition-all">
+        🏆 Résultat
+      </button>
+    }
+
+  </div>
+</div>

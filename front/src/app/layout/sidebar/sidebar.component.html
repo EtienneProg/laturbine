@@ -1,0 +1,33 @@
+<aside class="w-56 bg-card border-r border-border flex flex-col h-full shrink-0">
+
+  <div class="px-5 py-6 border-b border-border">
+    <div class="font-display text-lg font-black text-neon tracking-widest drop-shadow-[0_0_16px_rgba(0,245,255,0.6)]">
+      LA TURBINE
+    </div>
+    <div class="font-body text-xs text-muted tracking-widest uppercase mt-1">
+      Admin Dashboard
+    </div>
+  </div>
+
+  <nav class="flex flex-col gap-1 p-3 flex-1">
+    @for (item of navItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="bg-neon/10 border-neon/30 text-neon shadow-[inset_0_0_12px_rgba(0,245,255,0.05)]"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-transparent text-muted font-body text-sm hover:text-white hover:bg-white/5 transition-all"
+      >
+        <span class="text-base">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="p-4 border-t border-border">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-green animate-pulse shadow-[0_0_8px_rgba(0,255,136,0.8)]"></div>
+      <span class="font-body text-xs text-muted">Discord connecté</span>
+    </div>
+  </div>
+
+</aside>

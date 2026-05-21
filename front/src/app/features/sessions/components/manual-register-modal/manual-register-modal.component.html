@@ -1,0 +1,103 @@
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-card border border-purple/30 rounded-2xl p-7 w-full max-w-lg mx-4 shadow-[0_0_40px_rgba(191,95,255,0.1)]">
+
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-display text-xl text-purple tracking-wide">
+        👤 INSCRIRE DES JOUEURS
+      </h2>
+      <button (click)="close.emit()"
+              class="text-muted hover:text-white transition-colors font-display text-lg">
+        ✕
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="relative mb-4">
+      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm">🔍</span>
+      <input
+        type="text"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        placeholder="Rechercher un joueur..."
+        class="w-full bg-bg border border-border rounded-xl pl-10 pr-4 py-2.5 text-white font-body text-sm outline-none focus:border-purple/60 transition-all placeholder:text-muted"
+      />
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-muted text-xs font-body">
+        {{ available().length }} joueur(s) disponible(s)
+      </span>
+      <div class="flex gap-2">
+        <button (click)="selectAll()"
+                class="px-3 py-1 rounded-lg font-display text-xs text-purple border border-purple/40 bg-purple/10 hover:bg-purple/20 transition-all">
+          Tout sélectionner
+        </button>
+        <button (click)="clearAll()"
+                class="px-3 py-1 rounded-lg font-display text-xs text-muted border border-muted/40 bg-muted/10 hover:bg-muted/20 transition-all">
+          Effacer
+        </button>
+      </div>
+    </div>
+
+    <!-- Liste joueurs -->
+    <div class="bg-bg border border-border rounded-xl overflow-hidden max-h-64 overflow-y-auto mb-4">
+
+      @if (available().length === 0) {
+        <p class="text-muted text-sm font-body text-center py-8">
+          Aucun joueur disponible
+        </p>
+      }
+
+      @for (player of available(); track player.id) {
+        <div (click)="toggle(player.id)"
+             class="flex items-center gap-3 px-4 py-3 border-b border-border last:border-b-0 cursor-pointer transition-all"
+             [class]="isSelected(player.id) ? 'bg-purple/10 border-l-4 border-l-purple' : 'hover:bg-white/[0.02] border-l-4 border-l-transparent'">
+          <!-- Avatar -->
+          @if (player.avatarUrl) {
+            <img [src]="player.avatarUrl" class="w-8 h-8 rounded-lg object-cover border border-border flex-shrink-0" />
+          } @else {
+            <div class="w-8 h-8 rounded-lg bg-purple/10 border border-purple/30 flex items-center justify-center font-display text-xs text-purple flex-shrink-0">
+              {{ player.name.charAt(0).toUpperCase() }}
+            </div>
+          }
+
+          <div class="flex-1">
+            <div class="text-white text-sm font-body font-semibold">{{ player.name }}</div>
+            <div class="text-muted text-xs font-body">{{ player.discordTag }}</div>
+          </div>
+
+          <div class="font-display text-xs text-green">{{ player.elo }}</div>
+
+          <!-- Checkbox -->
+          <div class="w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-all"
+               [class]="isSelected(player.id) ? 'bg-purple border-purple' : 'border-border'">
+            @if (isSelected(player.id)) {
+              <span class="text-white text-xs">✓</span>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between">
+      <span class="text-muted text-xs font-body">
+        {{ selected().length }} joueur(s) sélectionné(s)
+      </span>
+      <div class="flex gap-3">
+        <button (click)="close.emit()"
+                class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-danger/10 border border-danger/60 text-danger hover:bg-danger/20 transition-all">
+          Annuler
+        </button>
+        <button (click)="onConfirm()"
+                [disabled]="selected().length === 0"
+                class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-purple/10 border border-purple/60 text-purple hover:bg-purple/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+          ✅ Inscrire ({{ selected().length }})
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

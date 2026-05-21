@@ -1,0 +1,68 @@
+<div class="bg-card border border-border rounded-2xl overflow-hidden">
+
+  <!-- Header -->
+  <div class="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_2fr_1fr_auto] px-5 py-3 border-b border-border font-display text-xs text-muted tracking-widest uppercase">
+    <span>Avatar</span>
+    <span>Joueur</span>
+    <span>ELO</span>
+    <span>V</span>
+    <span>D</span>
+    <span>Win rate</span>
+    <span>Action</span>
+    <span></span>
+  </div>
+
+  @if (players.length === 0) {
+    <p class="text-muted text-sm font-body text-center py-10">
+      Aucun joueur trouvé
+    </p>
+  }
+
+  @for (player of sorted; track player.id) {
+    <div class="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_2fr_1fr_auto] items-center px-5 py-4 border-b border-border last:border-0 hover:bg-white/[0.02] transition-colors">
+      @if (player.avatarUrl) {
+        <img [src]="player.avatarUrl"
+             class="w-8 h-8 rounded-lg object-cover border border-border" />
+      } @else {
+        <div class="w-8 h-8 rounded-lg bg-neon/10 border border-border
+              flex items-center justify-center
+              font-display text-xs text-neon">
+          {{ player.name.charAt(0).toUpperCase() }}
+        </div>
+      }
+      <button (click)="viewDetail.emit(player)"
+              class="text-left text-white text-sm font-body font-semibold hover:text-neon transition-colors">
+        {{ player.name }}
+      </button>
+
+      <span class="font-display text-sm text-green drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]" (click)="viewDetail.emit(player)">
+        {{ player.elo }}
+      </span>
+
+      <span class="font-body text-sm text-green" (click)="viewDetail.emit(player)">{{ player.wins }}</span>
+      <span class="font-body text-sm text-danger" (click)="viewDetail.emit(player)">{{ player.losses }}</span>
+
+      <div class="flex items-center gap-2" (click)="viewDetail.emit(player)">
+        <div class="h-1.5 w-24 bg-border rounded-full overflow-hidden">
+          <div class="h-full bg-green rounded-full transition-all"
+               [style.width]="winRate(player) === '—' ? '0%' : winRate(player)">
+          </div>
+        </div>
+        <span class="font-body text-xs text-muted">{{ winRate(player) }}</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button (click)="edit.emit(player)"
+                class="px-3 py-1.5 rounded-lg font-display text-xs bg-neon/10 border border-neon/40 text-neon hover:bg-neon/20 transition-all">
+          Éditer
+        </button>
+        <button (click)="delete.emit(player)"
+                class="px-3 py-1.5 rounded-lg font-display text-xs bg-danger/10 border border-danger/40 text-danger hover:bg-danger/20 transition-all">
+          ✕
+        </button>
+      </div>
+
+    </div>
+  }
+
+</div>

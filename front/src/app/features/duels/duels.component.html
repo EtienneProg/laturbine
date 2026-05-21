@@ -1,0 +1,85 @@
+<div class="p-8">
+
+  <!-- Modal création duel -->
+  @if (showModal()) {
+    <app-duel-create-modal
+      [sessionId]="activeSession()!.id"
+      [registrations]="activeSession()!.registrations"
+      (close)="showModal.set(false)"
+      (create)="onCreateDuel($event)"
+    />
+  }
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="font-display text-2xl font-bold text-neon drop-shadow-[0_0_16px_rgba(0,245,255,0.5)] tracking-wide">
+        ⚔️ Duels
+      </h1>
+      @if (activeSession()) {
+        <p class="text-muted text-sm font-body mt-1">
+          Session du {{ activeSession()!.date }} —
+          <span class="text-green">{{ activeSession()!.registrations.length }} inscrits</span>
+        </p>
+      }
+    </div>
+
+    <button
+      (click)="showModal.set(true)"
+      [disabled]="!activeSession()"
+      class="px-5 py-2.5 rounded-xl font-display text-sm tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+    >
+      + Nouveau duel
+    </button>
+  </div>
+
+  <!-- Pas de session active -->
+  @if (!activeSession() && !loading()) {
+    <div class="bg-card border border-border rounded-2xl p-10 text-center">
+      <div class="text-4xl mb-4">📅</div>
+      <p class="text-white font-body font-semibold mb-2">Aucune session active</p>
+      <p class="text-muted text-sm font-body">
+        Active une session dans l'onglet Sessions pour pouvoir créer des duels.
+      </p>
+    </div>
+  }
+
+  <!-- Loader -->
+  @if (loading()) {
+    <div class="flex items-center justify-center py-16">
+      <div class="w-8 h-8 border-2 border-neon border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  }
+
+  <!-- Duels en cours -->
+  @if (ongoingDuels.length > 0) {
+    <div class="mb-8">
+      <h2 class="font-display text-xs text-orange tracking-widest uppercase mb-4">
+        🔥 En cours ({{ ongoingDuels.length }})
+      </h2>
+      <div class="flex flex-col gap-3">
+        @for (duel of ongoingDuels; track duel.id) {
+          <app-duel-card
+            [duel]="duel"
+            (setResult)="onSetResult($event)"
+          />
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Duels terminés -->
+  @if (finishedDuels.length > 0) {
+    <div>
+      <h2 class="font-display text-xs text-muted tracking-widest uppercase mb-4">
+        Terminés ({{ finishedDuels.length }})
+      </h2>
+      <div class="flex flex-col gap-3">
+        @for (duel of finishedDuels; track duel.id) {
+          <app-duel-card [duel]="duel" />
+        }
+      </div>
+    </div>
+  }
+
+</div>

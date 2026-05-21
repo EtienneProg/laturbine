@@ -1,0 +1,15 @@
+<div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+  @for (stat of stats; track stat.label) {
+    <div class="bg-card border border-border rounded-2xl p-5 transition-all"
+         [class]="getCardClass(stat.color)">
+      <div class="text-2xl mb-2">{{ stat.icon }}</div>
+      <div class="font-display text-3xl font-bold"
+           [class]="getValueClass(stat.color)">
+        {{ stat.value }}
+      </div>
+      <div class="text-muted text-xs font-body mt-1 uppercase tracking-widest">
+        {{ stat.label }}
+      </div>
+    </div>
+  }
+</div>

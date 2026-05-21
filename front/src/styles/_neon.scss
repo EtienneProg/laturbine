@@ -1,0 +1,90 @@
+// ─────────────────────────────────────────
+// Classes utilitaires neon custom
+// (complément à Tailwind)
+// ─────────────────────────────────────────
+
+.neon-text {
+  color: #00f5ff;
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.6),
+  0 0 20px rgba(0, 245, 255, 0.3);
+}
+
+.neon-text-green {
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.6),
+  0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.neon-text-purple {
+  color: #bf5fff;
+  text-shadow: 0 0 10px rgba(191, 95, 255, 0.6),
+  0 0 20px rgba(191, 95, 255, 0.3);
+}
+
+.neon-text-orange {
+  color: #ff6b35;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+}
+
+// ─────────────────────────────────────────
+// Scrollbar custom
+// ─────────────────────────────────────────
+.scrollbar-neon {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 245, 255, 0.3) #12121a;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #12121a;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 245, 255, 0.3);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(0, 245, 255, 0.5);
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// Carte avec glow au hover
+// ─────────────────────────────────────────
+.card-neon {
+  background: #12121a;
+  border: 1px solid #1e1e2e;
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 245, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.08);
+  }
+}
+
+// ─────────────────────────────────────────
+// Input neon focus
+// ─────────────────────────────────────────
+.input-neon {
+  background: #0a0a0f;
+  border: 1px solid #1e1e2e;
+  border-radius: 0.75rem;
+  color: #e0e0ff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+
+  &::placeholder {
+    color: #6b6b8a;
+  }
+
+  &:focus {
+    border-color: rgba(0, 245, 255, 0.6);
+    box-shadow: 0 0 12px rgba(0, 245, 255, 0.15);
+  }
+}

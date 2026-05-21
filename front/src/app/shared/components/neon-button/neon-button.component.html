@@ -1,0 +1,10 @@
+<button
+  (click)="clicked.emit()"
+  [class]="classes"
+  [disabled]="disabled || loading"
+>
+  @if (loading) {
+    <span class="inline-block w-3 h-3 border border-current border-t-transparent rounded-full animate-spin mr-2"></span>
+  }
+  <ng-content />
+</button>

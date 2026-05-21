@@ -1,0 +1,87 @@
+// ─────────────────────────────────────────
+// Pulse neon
+// ─────────────────────────────────────────
+@keyframes neonPulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(0, 245, 255, 0.8);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: 0 0 4px rgba(0, 245, 255, 0.4);
+  }
+}
+
+.animate-neon-pulse {
+  animation: neonPulse 2s ease-in-out infinite;
+}
+
+// ─────────────────────────────────────────
+// Fade in from bottom
+// ─────────────────────────────────────────
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+// ─────────────────────────────────────────
+// Fade in
+// ─────────────────────────────────────────
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
+
+// ─────────────────────────────────────────
+// Scanline (effet déco optionnel)
+// ─────────────────────────────────────────
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scanline {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+      transparent,
+      rgba(0, 245, 255, 0.05),
+      transparent
+  );
+  animation: scanline 8s linear infinite;
+  z-index: 9999;
+}
+
+// ─────────────────────────────────────────
+// Glow border spin (loader custom)
+// ─────────────────────────────────────────
+@keyframes glowSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-glow-spin {
+  animation: glowSpin 1s linear infinite;
+  border: 2px solid transparent;
+  border-top-color: #00f5ff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.4);
+}

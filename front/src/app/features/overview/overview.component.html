@@ -1,0 +1,51 @@
+<div class="p-8">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="font-display text-2xl font-bold text-neon drop-shadow-[0_0_16px_rgba(0,245,255,0.5)] tracking-wide">
+      Vue d'ensemble
+    </h1>
+    <p class="text-muted text-sm font-body mt-1">
+      {{ today | date:'EEEE d MMMM yyyy' }}
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-6">
+    <!-- Stat cards -->
+    <app-quick-stats [stats]="statsItems"/>
+
+    <!-- Bottom grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+      <!-- Activité récente -->
+      <app-activity-feed [duels]="recentDuels" />
+
+      <!-- Top joueurs -->
+      <div class="bg-card border border-border rounded-2xl p-6">
+        <h2 class="font-display text-sm text-purple tracking-widest uppercase mb-4">
+          Top Joueurs
+        </h2>
+
+        @for (player of topPlayers; track player.id; let i = $index) {
+          <div class="flex items-center gap-3 py-3 border-b border-border last:border-0">
+            <div class="w-7 text-center font-display text-sm"
+                 [class]="i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-amber-600' : 'text-muted'">
+              {{ i < 3 ? ['🥇','🥈','🥉'][i] : '#' + (i + 1) }}
+            </div>
+            <div class="flex-1 text-white text-sm font-body font-semibold">
+              {{ player.name }}
+            </div>
+            <div class="font-display text-sm text-green drop-shadow-[0_0_8px_rgba(0,255,136,0.4)]">
+              {{ player.elo }}
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted text-sm font-body py-4 text-center">
+            Aucun joueur enregistré
+          </p>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

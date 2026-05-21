@@ -1,0 +1,22 @@
+<header class="h-14 bg-card border-b border-border flex items-center justify-between px-6 shrink-0">
+
+  <div class="font-body text-sm text-muted">
+    {{ today | date:"EEEE d MMMM yyyy — HH'h'mm" }}
+  </div>
+
+  <div class="flex items-center gap-4">
+
+    <div class="flex items-center gap-2 bg-bg border border-border rounded-xl px-3 py-1.5">
+      <div class="w-2 h-2 rounded-full bg-neon animate-pulse shadow-[0_0_8px_rgba(0,245,255,0.8)]"></div>
+      <span class="font-display text-xs text-neon tracking-widest">LIVE</span>
+    </div>
+
+    <button
+      (click)="logout()"
+      class="cursor-pointer px-4 py-1.5 rounded-xl font-display text-xs tracking-widest bg-danger/10 border border-danger/40 text-danger hover:bg-danger/20 transition-all"
+    >
+      Déconnexion
+    </button>
+
+  </div>
+</header>

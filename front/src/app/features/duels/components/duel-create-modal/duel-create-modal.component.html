@@ -1,0 +1,123 @@
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+
+  <div class="bg-card border border-neon/30 rounded-2xl p-7 w-full max-w-lg shadow-[0_0_40px_rgba(0,245,255,0.1)] mx-4">
+
+    <!-- Title -->
+    <h2 class="font-display text-xl text-neon tracking-wide drop-shadow-[0_0_12px_rgba(0,245,255,0.5)] mb-6">
+      ⚔️ NOUVEAU DUEL
+    </h2>
+
+    <!-- Taille des équipes -->
+    <div class="mb-6">
+      <p class="text-xs text-muted font-body uppercase tracking-widest mb-3">
+        Taille des équipes
+      </p>
+      <div class="flex gap-2">
+        @for (n of sizes; track n) {
+          <button
+            (click)="setTeamSize(n)"
+            [class]="teamSize() === n
+              ? 'w-10 h-10 rounded-lg font-display text-sm font-bold border-2 border-neon bg-neon/20 text-neon shadow-neon transition-all'
+              : 'w-10 h-10 rounded-lg font-display text-sm font-bold border border-border bg-bg text-muted hover:border-neon/40 hover:text-white transition-all'"
+          >
+            {{ n }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Sélection équipes -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+
+      <!-- Équipe 1 -->
+      <div>
+        <p class="text-xs text-neon font-body uppercase tracking-widest mb-2">
+          Équipe 1
+          <span class="text-muted ml-1">({{ team1Ids().length }}/{{ teamSize() }})</span>
+        </p>
+        <div class="bg-bg border border-border rounded-xl overflow-hidden max-h-52 overflow-y-auto">
+          @for (reg of registrations; track reg.playerId) {
+            <div
+              (click)="toggle(1, reg.playerId)"
+              [class]="isInOtherTeam(1, reg.playerId)
+                ? 'flex items-center gap-2 px-3 py-2.5 opacity-30 cursor-not-allowed'
+                : isInTeam(1, reg.playerId)
+                  ? 'flex items-center gap-2 px-3 py-2.5 cursor-pointer bg-neon/10 border-l-2 border-neon'
+                  : 'flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-white/5 border-l-2 border-transparent transition-all'"
+            >
+              <div [class]="isInTeam(1, reg.playerId)
+                ? 'w-2 h-2 rounded-full bg-neon shadow-neon flex-shrink-0'
+                : 'w-2 h-2 rounded-full bg-border flex-shrink-0'">
+              </div>
+              <span class="font-body text-sm"
+                    [class]="isInTeam(1, reg.playerId) ? 'text-white font-semibold' : 'text-muted'">
+                {{ reg.player.name }}
+              </span>
+            </div>
+          }
+
+          @if (registrations.length === 0) {
+            <p class="text-muted text-xs font-body text-center py-4">
+              Aucun inscrit
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Équipe 2 -->
+      <div>
+        <p class="text-xs text-purple font-body uppercase tracking-widest mb-2">
+          Équipe 2
+          <span class="text-muted ml-1">({{ team2Ids().length }}/{{ teamSize() }})</span>
+        </p>
+        <div class="bg-bg border border-border rounded-xl overflow-hidden max-h-52 overflow-y-auto">
+          @for (reg of registrations; track reg.playerId) {
+            <div
+              (click)="toggle(2, reg.playerId)"
+              [class]="isInOtherTeam(2, reg.playerId)
+                ? 'flex items-center gap-2 px-3 py-2.5 opacity-30 cursor-not-allowed'
+                : isInTeam(2, reg.playerId)
+                  ? 'flex items-center gap-2 px-3 py-2.5 cursor-pointer bg-purple/10 border-l-2 border-purple'
+                  : 'flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-white/5 border-l-2 border-transparent transition-all'"
+            >
+              <div [class]="isInTeam(2, reg.playerId)
+                ? 'w-2 h-2 rounded-full bg-purple flex-shrink-0'
+                : 'w-2 h-2 rounded-full bg-border flex-shrink-0'">
+              </div>
+              <span class="font-body text-sm"
+                    [class]="isInTeam(2, reg.playerId) ? 'text-white font-semibold' : 'text-muted'">
+                {{ reg.player.name }}
+              </span>
+            </div>
+          }
+
+          @if (registrations.length === 0) {
+            <p class="text-muted text-xs font-body text-center py-4">
+              Aucun inscrit
+            </p>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 justify-end">
+      <button
+        (click)="close.emit()"
+        class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-danger/10 border border-danger/50 text-danger hover:bg-danger/20 transition-all"
+      >
+        Annuler
+      </button>
+      <button
+        (click)="onSubmit()"
+        [disabled]="!canCreate()"
+        class="px-5 py-2.5 rounded-xl font-display text-xs tracking-widest bg-neon/10 border border-neon/60 text-neon hover:bg-neon/20 hover:shadow-neon disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+      >
+        ⚔️ Lancer le duel
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,19 @@
+{
+  "name": "la-turbine-lasergame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n \"FRONT,API,BOT\" -c \"cyan,green,yellow\" \"pnpm --filter front dev\" \"pnpm --filter api start:dev\" \"wait-on http://localhost:3000 && pnpm --filter bot start:dev\"",
+    "front": "pnpm --filter front dev",
+    "api": "pnpm --filter api start:dev",
+    "bot": "pnpm --filter bot start:dev"
+  },
+  "keywords": [],
+  "author": "Shadow",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.0",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

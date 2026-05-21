@@ -1,0 +1,22 @@
+<div class="bg-card border border-border rounded-2xl p-6">
+
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="font-display text-sm text-neon tracking-widest uppercase">
+      📈 Évolution ELO
+    </h2>
+    @if (playerName) {
+      <span class="text-muted text-xs font-body">{{ playerName }}</span>
+    }
+  </div>
+
+  @if (history.length === 0) {
+    <div class="flex items-center justify-center h-40">
+      <p class="text-muted text-sm font-body">Pas encore de données</p>
+    </div>
+  } @else {
+    <div class="relative h-52">
+      <canvas #chartCanvas></canvas>
+    </div>
+  }
+
+</div>
