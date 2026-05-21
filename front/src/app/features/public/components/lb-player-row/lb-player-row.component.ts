@@ -1,28 +1,19 @@
 import {
   Component, Input, OnChanges, SimpleChanges,
-  signal
+  signal, ElementRef, inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Player } from '../../../../core/models/player.model';
 
 @Component({
-  selector: '[app-lb-player-row]', // ← sélecteur attribut
-  host: { class: 'bg-[#2a1747]/75 rounded-2xl transition-all duration-500 w-full' },
-
+  selector: '[app-lb-player-row]',
+  host: {
+    class: 'bg-[#2a1747]/75 rounded-2xl',
+  },
   standalone: true,
   imports: [CommonModule],
   templateUrl: './lb-player-row.component.html',
   styles: [`
-    @keyframes rankUp {
-      0%   { background: rgba(0,255,136,0.3); transform: translateX(-8px); }
-      50%  { background: rgba(0,255,136,0.15); }
-      100% { background: transparent; transform: translateX(0); }
-    }
-    @keyframes rankDown {
-      0%   { background: rgba(255,59,92,0.3); transform: translateX(8px); }
-      50%  { background: rgba(255,59,92,0.15); }
-      100% { background: transparent; transform: translateX(0); }
-    }
     @keyframes eloFlash {
       0%,100% { opacity: 1; }
       50%     { opacity: 0.3; }
@@ -32,74 +23,88 @@ import { Player } from '../../../../core/models/player.model';
       70%  { opacity: 1; transform: translateY(-4px); }
       100% { opacity: 0; transform: translateY(-12px); }
     }
-    .anim-rank-up   { animation: rankUp   1.2s ease forwards; }
-    .anim-rank-down { animation: rankDown 1.2s ease forwards; }
+    :host {
+      display: table-row;
+      transition: background 0.5s ease;
+    }
     .anim-elo-flash { animation: eloFlash 0.4s ease 3; }
     .badge-fade     { animation: badgeFade 3s ease forwards; }
   `]
 })
 export class LbPlayerRowComponent implements OnChanges {
-  @Input() player!: Player;
-  @Input() rank!: number;
-  @Input() grade!: string;
+  @Input() player!:    Player;
+  @Input() rank!:      number;
+  @Input() grade!:     string;
   @Input() lastMatch!: string;
 
-  displayElo    = signal(0);
-  prevRank      = signal(0);
-  rankDelta     = signal(0);
-  animClass     = signal('');
-  eloAnimClass  = signal('');
-  showBadge     = signal(false);
-  eloChanging   = signal(false);
-  eloColor      = signal('');
+  displayElo   = signal(0);
+  rankDelta    = signal(0);
+  animClass    = signal('');
+  eloAnimClass = signal('');
+  showBadge    = signal(false);
+  eloColor     = signal('');
 
+  private el          = inject(ElementRef);
   private eloInterval: any;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['player']) {
       const prev = changes['player'].previousValue as Player | undefined;
       const curr = changes['player'].currentValue as Player;
-
       if (!prev) {
-        // Premier chargement — pas d'animation
         this.displayElo.set(curr.elo);
         return;
       }
-
-      // ELO a changé
-      if (prev.elo !== curr.elo) {
-        this.animateElo(prev.elo, curr.elo);
-      }
+      if (prev.elo !== curr.elo) this.animateElo(prev.elo, curr.elo);
     }
 
     if (changes['rank']) {
       const prevR = changes['rank'].previousValue as number | undefined;
       const currR = changes['rank'].currentValue as number;
-
       if (prevR !== undefined && prevR !== currR) {
-        const delta = prevR - currR; // positif = monte, négatif = descend
+        const delta = prevR - currR;
         this.rankDelta.set(delta);
         this.showBadge.set(true);
-        this.animClass.set(delta > 0 ? 'anim-rank-up' : 'anim-rank-down');
-
-        // Cache le badge après 3s
-        setTimeout(() => {
-          this.showBadge.set(false);
-          this.animClass.set('');
-        }, 3000);
+        setTimeout(() => { this.showBadge.set(false); }, 3500);
       }
     }
   }
 
+  // Appelé depuis le parent AVANT le refresh pour mémoriser la position
+  getRect(): DOMRect {
+    return this.el.nativeElement.getBoundingClientRect();
+  }
+
+  // Appelé depuis le parent APRÈS le refresh pour lancer le glissement
+  playFlip(fromY: number): void {
+    const toY    = this.el.nativeElement.getBoundingClientRect().top;
+    const deltaY = fromY - toY;
+    if (Math.abs(deltaY) < 2) return;
+
+    const el = this.el.nativeElement as HTMLElement;
+    el.style.transition = 'none';
+    el.style.transform  = `translateY(${deltaY}px)`;
+
+    // Force reflow
+    el.getBoundingClientRect();
+
+    el.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    el.style.transform  = 'translateY(0)';
+
+    // Nettoyage
+    setTimeout(() => {
+      el.style.transition = '';
+      el.style.transform  = '';
+    }, 650);
+  }
+
   private animateElo(from: number, to: number): void {
     clearInterval(this.eloInterval);
-
-    const diff     = to - from;
-    const duration = 1500; // ms
-    const steps    = 60;
-    const step     = diff / steps;
-    let   current  = from;
-    let   count    = 0;
+    const diff  = to - from;
+    const steps = 60;
+    const step  = diff / steps;
+    let current = from;
+    let count   = 0;
 
     this.eloColor.set(diff > 0 ? 'text-green-400' : 'text-red-500');
     this.eloAnimClass.set('anim-elo-flash');
@@ -108,17 +113,12 @@ export class LbPlayerRowComponent implements OnChanges {
       count++;
       current += step;
       this.displayElo.set(Math.round(current));
-
       if (count >= steps) {
         clearInterval(this.eloInterval);
         this.displayElo.set(to);
-        // Remet la couleur normale après 2s
-        setTimeout(() => {
-          this.eloColor.set('');
-          this.eloAnimClass.set('');
-        }, 2000);
+        setTimeout(() => { this.eloColor.set(''); this.eloAnimClass.set(''); }, 2000);
       }
-    }, duration / steps);
+    }, 1500 / steps);
   }
 
   get rankShadow(): string {

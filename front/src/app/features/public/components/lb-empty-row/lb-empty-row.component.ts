@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: '[app-lb-empty-row]',
-  host: { class: 'w-full' },
+  host: { class: 'w-full bg-[#2a1747]/75 rounded-2xl' },
   standalone: true,
   imports: [CommonModule],
   template: `
