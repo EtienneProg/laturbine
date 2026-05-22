@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'laturbine-api.up.railway.app:3000',
+  apiUrl: 'https://laturbine-api.up.railway.app',
 };
