@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EloPoint } from '../../../../core/models/player.model';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, TooltipItem } from 'chart.js';
 
 Chart.register(...registerables);
 
@@ -91,7 +91,7 @@ export class EloChartComponent implements AfterViewInit, OnChanges, OnDestroy {
             titleFont: { family: 'Inter', size: 11 },
             padding: 12,
             callbacks: {
-              label: (ctx) => ` ${ctx.parsed.y} ELO`,
+              label: (ctx: TooltipItem<'line'>) => ` ${ctx.parsed.y} ELO`,
             }
           },
         },
