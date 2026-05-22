@@ -14,9 +14,13 @@ async function bootstrap() {
     }),
   );
 
+  const allowedOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:4200')
+    .split(',')
+    .map((o) => o.trim());
+
   // CORS pour le dashboard Angular
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:4200',
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
