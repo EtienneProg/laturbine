@@ -7,7 +7,11 @@
     "dev": "concurrently -n \"FRONT,API,BOT\" -c \"cyan,green,yellow\" \"pnpm --filter front dev\" \"pnpm --filter api start:dev\" \"wait-on http://localhost:3000 && pnpm --filter bot start:dev\"",
     "front": "pnpm --filter front dev",
     "api": "pnpm --filter api start:dev",
-    "bot": "pnpm --filter bot start:dev"
+    "bot": "pnpm --filter bot start:dev",
+    "deploy:api":   "git subtree push --prefix=api origin-api main",
+    "deploy:bot":   "git subtree push --prefix=bot origin-bot main",
+    "deploy:front": "git subtree push --prefix=front origin-front main",
+    "deploy:all":   "pnpm deploy:api && pnpm deploy:bot && pnpm deploy:front"
   },
   "keywords": [],
   "author": "Shadow",
