@@ -31,9 +31,9 @@ model GameMode {
 
 model Player {
   id         Int      @id @default(autoincrement())
-  name       String   @unique
+  name       String
   discordId  String   @unique
-  discordTag String
+  discordTag String   @unique
   elo        Int      @default(1500)
   wins       Int      @default(0) // uniquement duels
   losses     Int      @default(0) // uniquement duels
