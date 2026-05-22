@@ -62,5 +62,5 @@ export const apiService = {
         request('GET', `/players/discord/${discordId}`),
 
     getDuel: (id: number) =>
-        request('GET', `/duels/${id}`),
+        request('GET', `/games/${id}`),
 };

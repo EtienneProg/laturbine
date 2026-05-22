@@ -23,6 +23,9 @@ export class DuelsComponent implements OnInit {
   activeSession  = signal<Session | null>(null);
   showModal      = signal(false);
   loading        = signal(true);
+  creating       = signal(false);
+  settingResult  = signal<number | null>(null); // stocke l'id du duel en cours de traitement
+
 
   get ongoingDuels()  { return this.duels().filter(d => d.status === 'ONGOING'); }
   get finishedDuels() { return this.duels().filter(d => d.status === 'FINISHED'); }
@@ -51,20 +54,40 @@ export class DuelsComponent implements OnInit {
   }
 
   onCreateDuel(payload: CreateDuelPayload): void {
-    this.duelService.create(payload).subscribe(duel => {
-      this.duels.update(d => [duel, ...d]);
-      this.discordService.announceDuel(duel.id).subscribe();
-      this.showModal.set(false);
+    if (this.creating()) return;
+    this.creating.set(true);
+
+    this.duelService.create(payload).subscribe({
+      next: (duel) => {
+        this.duels.update(d => [duel, ...d]);
+        this.discordService.announceDuel(duel.id).subscribe();
+        this.showModal.set(false);
+        this.creating.set(false);
+      },
+      error: () => {
+        this.creating.set(false);
+      }
     });
+
   }
 
   onSetResult(event: { duelId: number; winnerTeamId: number }): void {
+    if (this.settingResult() !== null) return;
+    this.settingResult.set(event.duelId);
+
     this.duelService.setResult(event.duelId, { winnerTeamId: event.winnerTeamId })
-      .subscribe(updated => {
-        this.duels.update(list =>
-          list.map(d => d.id === updated.id ? updated : d)
-        );
-        this.discordService.announceResult(event.duelId).subscribe();
+      .subscribe({
+        next: (updated) => {
+          this.duels.update(list =>
+            list.map(d => d.id === updated.id ? updated : d)
+          );
+          this.discordService.announceResult(event.duelId).subscribe();
+          this.settingResult.set(null);
+        },
+        error: () => {
+          this.settingResult.set(null);
+        }
       });
+
   }
 }

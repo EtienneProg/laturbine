@@ -18,10 +18,13 @@ export class DuelCreateModalComponent {
   teamSize  = signal(1);
   team1Ids  = signal<number[]>([]);
   team2Ids  = signal<number[]>([]);
+  creating  = signal(false);
+
 
   sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   canCreate = computed(() =>
+    this.creating() &&
     this.team1Ids().length === this.teamSize() &&
     this.team2Ids().length === this.teamSize()
   );
@@ -57,6 +60,7 @@ export class DuelCreateModalComponent {
 
   onSubmit(): void {
     if (!this.canCreate()) return;
+    this.creating.set(true);
     this.create.emit({
       sessionId: this.sessionId,
       teamSize: this.teamSize(),
