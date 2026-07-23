@@ -73,7 +73,7 @@ export class SessionsController {
     @Param('id', ParseIntPipe) sessionId: number,
     @Param('playerId', ParseIntPipe) playerId: number,
   ) {
-    return this.sessionsService.registerPlayer(sessionId, playerId);
+    return this.sessionsService.registerPlayer(sessionId, playerId, false);
   }
 
   @Delete(':id/register/:playerId')

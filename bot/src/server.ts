@@ -52,6 +52,27 @@ export function startServer(client: BotClient): void {
         }
     });
 
+    app.put('/update-session/:id', async (req, res) => {
+        try {
+            const sessionId = Number(req.params.id);
+            const session   = await apiService.getSession(sessionId) as any;
+            const count     = session.registrations?.length ?? 0;
+
+            const messages = await apiService.getActiveMessages() as any[];
+            const msg      = messages.find(m => m.type === 'session' && m.refId === sessionId);
+
+            if (msg) {
+                const channel = await client.channels.fetch(msg.channelId) as TextChannel;
+                const message = await channel.messages.fetch(msg.messageId);
+                await message.edit(embedService.sessionUpdate(session, count));
+            }
+
+            res.json({ success: true });
+        } catch (err: any) {
+            res.status(500).json({ message: err.message });
+        }
+    });
+
     // Annonce duel
     app.post('/announce-duel/:id', async (req, res) => {
         try {

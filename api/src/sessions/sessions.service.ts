@@ -6,10 +6,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { GameStatus, SessionStatus } from '@prisma/client';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class SessionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private discord: DiscordService,
+  ) {}
 
   async findAll() {
     return this.prisma.session.findMany({
@@ -141,18 +145,29 @@ export class SessionsService {
     return this.unregisterPlayer(sessionId, player.id);
   }
 
-  async registerPlayer(sessionId: number, playerId: number) {
+  async registerPlayer(
+    sessionId: number,
+    playerId: number,
+    skipDiscord = true,
+  ) {
     const session = await this.findOne(sessionId);
 
     if (session.status === SessionStatus.CLOSED) {
       throw new BadRequestException('Cette session est clôturée');
     }
 
-    return this.prisma.registration.upsert({
+    const result = this.prisma.registration.upsert({
       where: { playerId_sessionId: { playerId, sessionId } },
       create: { playerId, sessionId },
       update: {},
     });
+
+    // Met à jour Discord seulement si pas appelé depuis le bot
+    if (!skipDiscord) {
+      this.discord.updateSessionMessage(sessionId).catch(() => {});
+    }
+
+    return result;
   }
 
   async unregisterPlayer(sessionId: number, playerId: number) {

@@ -2,14 +2,14 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { PlayerService } from '../../core/services/player.service';
-import { DuelService } from '../../core/services/duel.service';
 import { SessionService } from '../../core/services/session.service';
 import { Player } from '../../core/models/player.model';
-import { Duel } from '../../core/models/duel.model';
 import { Session } from '../../core/models/session.model';
-import { DatePipe } from '@angular/common';
 import { ActivityFeedComponent } from './components/activity-feed/activity-feed.component';
 import { QuickStatsComponent } from './components/quick-stats/quick-stats.component';
+import {GameService} from '../../core/services/game.service';
+import {Game} from '../../core/models/game.model';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'app-overview',
@@ -19,13 +19,13 @@ import { QuickStatsComponent } from './components/quick-stats/quick-stats.compon
 })
 export class OverviewComponent implements OnInit {
   private playerService = inject(PlayerService);
-  private duelService = inject(DuelService);
+  private gameService = inject(GameService);
   private sessionService = inject(SessionService);
 
   today = new Date();
 
   players = signal<Player[]>([]);
-  duels = signal<Duel[]>([]);
+  duels = signal<Game[]>([]);
   sessions = signal<Session[]>([]);
   loading = signal(true);
 
@@ -58,11 +58,17 @@ export class OverviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.playerService.getAll().subscribe((p) => this.players.set(p));
-    this.duelService.getAll().subscribe((d) => {
-      this.duels.set(d);
+    this.loading.set(true);
+
+    forkJoin([
+      this.playerService.getAll(),
+      this.gameService.getAll(),
+      this.sessionService.getAll(),
+    ]).subscribe(([players, games, sessions]) => {
+      this.players.set(players);
+      this.duels.set(games);
+      this.sessions.set(sessions);
       this.loading.set(false);
     });
-    this.sessionService.getAll().subscribe((s) => this.sessions.set(s));
   }
 }

@@ -52,8 +52,8 @@ export const embedService = {
 
     // Embed annonce duel
     duelAnnounce(duel: any) {
-        const team1 = duel.teams.find((t: any) => t.number === 1);
-        const team2 = duel.teams.find((t: any) => t.number === 2);
+        const team1 = duel.teams.find((t: any) => t.name === 'Équipe 1');
+        const team2 = duel.teams.find((t: any) => t.name === 'Équipe 2');
 
         const team1Names = team1?.players.map((tp: any) => tp.player.name).join('\n') ?? '—';
         const team2Names = team2?.players.map((tp: any) => tp.player.name).join('\n') ?? '—';

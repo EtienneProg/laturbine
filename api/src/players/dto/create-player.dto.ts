@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePlayerDto {
   @IsString()
@@ -6,10 +6,10 @@ export class CreatePlayerDto {
   name: string;
 
   @IsString()
-  @IsNotEmpty()
-  discordId: string;
+  @IsOptional()
+  discordId?: string;
 
   @IsString()
-  @IsNotEmpty()
-  discordTag: string;
+  @IsOptional()
+  discordTag?: string;
 }

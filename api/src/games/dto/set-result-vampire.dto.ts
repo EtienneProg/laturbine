@@ -1,4 +1,4 @@
-import { IsArray, IsInt } from 'class-validator';
+import { IsArray, IsIn, IsInt } from 'class-validator';
 
 export class SetResultVampireDto {
   // "vampires" | "villagers"
@@ -8,5 +8,6 @@ export class SetResultVampireDto {
   // Si vampires gagnent → tableau vide, on prend les vampires auto
   survivingVillagerIds: number[];
 
+  @IsIn(['vampires', 'villagers'])
   winner: 'vampires' | 'villagers';
 }

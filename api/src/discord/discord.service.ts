@@ -68,6 +68,10 @@ export class DiscordService {
     await this.callBot(`/announce-session/${sessionId}`);
   }
 
+  async updateSessionMessage(sessionId: number): Promise<void> {
+    await this.callBot(`/update-session/${sessionId}`, 'PUT');
+  }
+
   async announceDuel(duelId: number): Promise<void> {
     await this.callBot(`/announce-duel/${duelId}`);
   }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Game } from '../../../../core/models/game.model';
 import { SetResultDuelPayload, SetResultVampirePayload, SetResultHungerGamesPayload } from '../../../../core/models/game.model';
 import { SessionService } from '../../../../core/services/session.service';
-import { Player } from '../../../../core/models/player.model';
 
 @Component({
   selector: 'app-game-result-modal',
@@ -31,6 +30,7 @@ export class GameResultModalComponent implements OnInit {
   sessionPlayers       = signal<{ id: number; name: string }[]>([]);
   winnerPlayerIds      = signal<number[]>([]);
   lastManStanding      = signal(false);
+  loading = signal(false);
 
   get mode(): string { return this.game.gameMode.key; }
 
@@ -90,6 +90,9 @@ export class GameResultModalComponent implements OnInit {
   });
 
   onConfirm(): void {
+    if (!this.canConfirm() || this.loading()) return;
+    this.loading.set(true);
+
     if (this.mode === 'DUEL') {
       this.resultDuel.emit({ winnerTeamId: this.selectedWinnerTeamId()! });
     } else if (this.mode === 'VAMPIRE') {

@@ -3,13 +3,13 @@
     Activité récente
   </h2>
 
-  @if (duels.length === 0) {
+  @if (games.length === 0) {
     <p class="text-muted text-sm font-body text-center py-6">
       Aucun duel pour le moment
     </p>
   }
 
-  @for (duel of duels; track duel.id) {
+  @for (duel of games; track duel.id) {
     <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
       <div>
         <div class="text-white text-sm font-body">

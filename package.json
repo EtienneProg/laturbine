@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently -n \"FRONT,API,BOT\" -c \"cyan,green,yellow\" \"pnpm --filter front dev\" \"pnpm --filter api start:dev\" \"wait-on http://localhost:3000 && pnpm --filter bot start:dev\"",
-    "front": "pnpm --filter front dev",
+    "front": "pnpm --filter la-turbine dev",
     "api": "pnpm --filter api start:dev",
     "bot": "pnpm --filter bot start:dev",
     "deploy:api":   "git subtree push --prefix=api origin-api main",

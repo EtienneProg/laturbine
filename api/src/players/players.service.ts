@@ -49,7 +49,10 @@ export class PlayersService {
   async create(dto: CreatePlayerDto) {
     const existing = await this.prisma.player.findFirst({
       where: {
-        OR: [{ name: dto.name }, { discordId: dto.discordId }],
+        OR: [
+          { name: dto.name },
+          ...(dto.discordId ? [{ discordId: dto.discordId }] : []),
+        ],
       },
     });
 
@@ -59,7 +62,13 @@ export class PlayersService {
       );
     }
 
-    return this.prisma.player.create({ data: dto });
+    return this.prisma.player.create({
+      data: {
+        name: dto.name,
+        discordId: dto.discordId ?? `manual_${Date.now()}`,
+        discordTag: dto.discordTag ?? dto.name,
+      },
+    });
   }
 
   async update(id: number, dto: UpdatePlayerDto) {
