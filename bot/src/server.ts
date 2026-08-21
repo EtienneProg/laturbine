@@ -206,6 +206,29 @@ export function startServer(client: BotClient): void {
         }
     });
 
+    // Vide les channels Discord à la clôture d'une saison
+    app.post('/clear-season-channels', async (req, res) => {
+        try {
+            const channelIds = [
+                process.env.CHANNEL_SESSIONS,
+                process.env.CHANNEL_DUELS,
+                process.env.CHANNEL_RESULTS,
+                process.env.CHANNEL_PROFILE,
+                process.env.CHANNEL_LEADERBOARD,
+            ].filter((id): id is string => !!id);
+
+            for (const channelId of channelIds) {
+                const channel = await client.channels.fetch(channelId) as TextChannel;
+                await messageService.clearChannelMessages(channel);
+            }
+
+            res.json({ success: true });
+        } catch (err: any) {
+            console.error('Erreur clear-season-channels:', err);
+            res.status(500).json({ message: err.message });
+        }
+    });
+
     app.listen(port, () => {
         console.log(`🌐 Bot HTTP server listening on port ${port}`);
     });

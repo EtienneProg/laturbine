@@ -38,7 +38,7 @@ import { CommonModule } from '@angular/common';
 
     /* Point qui tourne autour du cadre */
     @keyframes orbitFrame {
-      0%   { offset-distance: 0%; }
+      0%   { offset-distance: 0; }
       100% { offset-distance: 100%; }
     }
 

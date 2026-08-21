@@ -127,4 +127,12 @@ export class DiscordService {
       },
     });
   }
+
+  // ─────────────────────────────────────────
+  // Vide les channels sessions/duels/résultats
+  // (appelé à la clôture d'une saison)
+  // ─────────────────────────────────────────
+  async clearSeasonChannels(): Promise<void> {
+    await this.callBot('/clear-season-channels', 'POST');
+  }
 }

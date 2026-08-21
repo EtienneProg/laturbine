@@ -10,6 +10,7 @@ import { EloModule } from './elo/elo.module';
 import { GamesModule } from './games/games.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { PublicModule } from './public/public.module';
+import { SeasonModule } from './season/season.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PublicModule } from './public/public.module';
     EloModule,
     AchievementsModule,
     PublicModule,
+    SeasonModule,
   ],
 })
 export class AppModule {}

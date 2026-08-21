@@ -45,7 +45,7 @@ export class OverviewComponent implements OnInit {
     return this.duels().slice(0, 5);
   }
   get topPlayers() {
-    return [...this.players()].sort((a, b) => b.elo - a.elo).slice(0, 5);
+    return [...this.players()].filter((p)=>p.isActive).sort((a, b) => b.elo - a.elo).slice(0, 5);
   }
 
   get statsItems() {

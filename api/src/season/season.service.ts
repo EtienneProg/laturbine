@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class SeasonService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private discordService: DiscordService,
+  ) {}
 
   async getActiveSeason() {
     return this.prisma.season.findFirst({ where: { isActive: true } });
@@ -38,14 +42,17 @@ export class SeasonService {
   //  - dump JSON players + achievements débloqués (rawExport)
   //  - attribue les badges de fin de saison aux joueurs ACTIFS
   //    (participation + top1/top3/top10 selon l'elo)
+  //  - supprime TOUT l'historique de games et sessions (cascade
+  //    → teams, teamPlayers, eloHistory disparaissent avec)
+  //  - supprime les DiscordMessage trackés liés à ces sessions/duels
   //  - reset elo/wins/losses de tous les joueurs
   //  - reset TOUS les achievements (progress + unlockedAt)
   //  - repasse TOUS les joueurs en isActive = false
-  //    (redeviendront actifs à leur prochaine inscription à une session)
   // Puis crée et active la nouvelle saison.
+  // Enfin (hors transaction), demande au bot de vider les channels Discord.
   // ─────────────────────────────────────────
   async closeSeasonAndStartNew(label?: string) {
-    return this.prisma.$transaction(async (tx) => {
+    const newSeason = await this.prisma.$transaction(async (tx) => {
       const currentSeason = await tx.season.findFirst({
         where: { isActive: true },
       });
@@ -72,7 +79,6 @@ export class SeasonService {
 
         // ─────────────────────────────────────────
         // Badges de fin de saison — uniquement pour les joueurs actifs
-        // (= ceux qui se sont inscrits à au moins une session cette saison)
         // ─────────────────────────────────────────
         const activePlayers = players
           .filter((p) => p.isActive)
@@ -90,7 +96,7 @@ export class SeasonService {
               icon: '🎮',
               seasonId: currentSeason.id,
             },
-            update: {}, // déjà créé (ex: appel rejoué) → on ne touche à rien
+            update: {},
           });
 
           await tx.playerBadge.createMany({
@@ -173,6 +179,19 @@ export class SeasonService {
             rawExport,
           },
         });
+
+        // ─────────────────────────────────────────
+        // Supprime tout l'historique de games/sessions —
+        // le cascade Prisma/Postgres nettoie automatiquement
+        // Game → Team → TeamPlayer et Game → EloHistory
+        // ─────────────────────────────────────────
+        await tx.session.deleteMany({});
+
+        // Les DiscordMessage ne sont pas liés par FK (juste un refId),
+        // donc pas de cascade — on les nettoie explicitement
+        await tx.discordMessage.deleteMany({
+          where: { type: { in: ['session', 'duel'] } },
+        });
       }
 
       // Reset ELO / wins / losses / statut actif pour tous les joueurs
@@ -191,7 +210,7 @@ export class SeasonService {
       });
       const nextNumber = (lastSeason?.number ?? 0) + 1;
 
-      return await tx.season.create({
+      return tx.season.create({
         data: {
           number: nextNumber,
           label,
@@ -199,5 +218,11 @@ export class SeasonService {
         },
       });
     });
+
+    // Hors transaction : notifie le bot pour vider les channels Discord
+    // (échec réseau ici ne doit pas annuler la clôture déjà commit en base)
+    this.discordService.clearSeasonChannels().catch(() => {});
+
+    return newSeason;
   }
 }
