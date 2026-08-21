@@ -1,9 +1,9 @@
 import { BotClient } from '../index';
 import { pingCommand } from './ping';
 import { leaderboardCommand } from './leaderboard';
-import { messtatsCommand } from './messtats';
+import { profileCommand } from "./profile";
 
-const commands = [pingCommand, leaderboardCommand, messtatsCommand];
+const commands = [pingCommand, leaderboardCommand, profileCommand];
 
 export function loadCommands(client: BotClient): void {
     for (const command of commands) {

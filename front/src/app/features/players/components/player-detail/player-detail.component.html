@@ -149,7 +149,7 @@
     </div>
 
     <!-- Historique ELO -->
-    <div class="bg-card border border-border rounded-2xl p-6">
+    <div class="bg-card border border-border rounded-2xl p-6 mb-6">
       <h2 class="font-display text-sm text-neon tracking-widest uppercase mb-5">
         📈 Historique ELO
       </h2>
@@ -197,12 +197,35 @@
         </div>
       }
     </div>
-    <app-player-achievements
-      [achievements]="achievements()"
-      [playerId]="player()!.id"
-      (increment)="onIncrementAchievement($event)"
-      (unlock)="onUnlockAchievement($event)"
-    />
+
+    <!-- Onglets Achievements / Badges -->
+    <div class="flex items-center gap-2 mb-4">
+      <button (click)="activeTab.set('achievements')"
+              class="px-4 py-2 rounded-lg font-display text-xs tracking-widest uppercase transition-all"
+              [class]="activeTab() === 'achievements'
+                ? 'bg-neon/20 border border-neon/60 text-neon'
+                : 'bg-card border border-border text-muted hover:text-white'">
+        🏆 Achievements
+      </button>
+      <button (click)="activeTab.set('badges')"
+              class="px-4 py-2 rounded-lg font-display text-xs tracking-widest uppercase transition-all"
+              [class]="activeTab() === 'badges'
+                ? 'bg-purple/20 border border-purple/60 text-purple'
+                : 'bg-card border border-border text-muted hover:text-white'">
+        🎖️ Badges
+      </button>
+    </div>
+
+    @if (activeTab() === 'achievements') {
+      <app-player-achievements
+        [achievements]="achievements()"
+        [playerId]="player()!.id"
+        (increment)="onIncrementAchievement($event)"
+        (unlock)="onUnlockAchievement($event)"
+      />
+    } @else {
+      <app-player-badges [badges]="badges()" />
+    }
   }
 
   <!-- Joueur non trouvé -->

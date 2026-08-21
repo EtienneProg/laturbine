@@ -8,6 +8,7 @@ export class LeaderboardController {
   @Get()
   async getLeaderboard() {
     const players = await this.prisma.player.findMany({
+      where: { isActive: true },
       orderBy: { elo: 'desc' },
       select: {
         id: true,

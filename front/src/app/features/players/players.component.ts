@@ -88,6 +88,6 @@ export class PlayersComponent implements OnInit {
   }
 
   onViewDetail(player: Player): void {
-    this.router.navigate(['/players', player.id]);
+    this.router.navigate(['/admin/players', player.id]);
   }
 }

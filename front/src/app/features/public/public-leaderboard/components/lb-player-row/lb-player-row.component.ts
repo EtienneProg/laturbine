@@ -3,7 +3,7 @@ import {
   signal, ElementRef, inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Player } from '../../../../core/models/player.model';
+import { Player } from '../../../../../core/models/player.model';
 
 @Component({
   selector: '[app-lb-player-row]',

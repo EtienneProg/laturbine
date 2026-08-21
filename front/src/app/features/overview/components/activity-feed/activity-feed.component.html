@@ -5,27 +5,58 @@
 
   @if (games.length === 0) {
     <p class="text-muted text-sm font-body text-center py-6">
-      Aucun duel pour le moment
+      Aucune activité pour le moment
     </p>
   }
 
-  @for (duel of games; track duel.id) {
-    <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
-      <div>
-        <div class="text-white text-sm font-body">
-          {{ getTeamNames(duel, 0) }}
-          <span class="text-muted mx-1">vs</span>
-          {{ getTeamNames(duel, 1) }}
+  @for (game of games; track game.id) {
+    <div class="flex items-center justify-between py-3 border-b border-border last:border-0 gap-4">
+      <div class="min-w-0">
+
+        <div class="text-white text-sm font-body flex items-center gap-2 flex-wrap">
+          <span>{{ modeIcon(game) }}</span>
+
+          @switch (modeKey(game)) {
+
+            @case ('DUEL') {
+              {{ duelTeamNames(game, 0) }}
+              <span class="text-muted">vs</span>
+              {{ duelTeamNames(game, 1) }}
+            }
+
+            @case ('VAMPIRE') {
+              <span class="text-purple">🧛 {{ vampireNames(game) }}</span>
+              <span class="text-muted">vs</span>
+              <span class="text-neon">🏘️ {{ villagerNames(game) }}</span>
+            }
+
+            @case ('HUNGER_GAMES') {
+              @if (game.status === 'FINISHED') {
+                @if (hungerGamesParticipants(game)) {
+                  <span class="text-green">🏆 Survivant(s) : {{ hungerGamesParticipants(game) }}</span>
+                } @else {
+                  <span class="text-muted">Résultat indisponible</span>
+                }
+              } @else {
+                <span class="text-muted">Battle royale en cours...</span>
+              }
+            }
+
+            @default {
+              <span class="text-muted">Partie #{{ game.id }}</span>
+            }
+          }
         </div>
+
         <div class="text-muted text-xs mt-0.5">
-          {{ duel.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          {{ game.createdAt | date:'dd/MM/yyyy HH:mm' }}
         </div>
       </div>
 
-      <span [class]="duel.status === 'FINISHED'
+      <span class="flex-shrink-0" [class]="game.status === 'FINISHED'
         ? 'px-3 py-1 rounded-full text-xs font-body bg-muted/20 text-muted border border-muted/40'
         : 'px-3 py-1 rounded-full text-xs font-body bg-orange/20 text-orange border border-orange/40'">
-        {{ duel.status === 'FINISHED' ? '✅ Terminé' : '🔥 En cours' }}
+        {{ game.status === 'FINISHED' ? '✅ Terminé' : '🔥 En cours' }}
       </span>
     </div>
   }

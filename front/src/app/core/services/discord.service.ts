@@ -21,4 +21,12 @@ export class DiscordService {
   announceResult(duelId: number): Observable<void> {
     return this.api.post<void>(`/discord/announce-result/${duelId}`, {});
   }
+
+  announceVampireResult(gameId: number): Observable<void> {
+    return this.api.post<void>(`/discord/announce-result/vampire/${gameId}`, {});
+  }
+
+  announceHungerGamesResult(gameId: number): Observable<void> {
+    return this.api.post<void>(`/discord/announce-result/hunger-games/${gameId}`, {});
+  }
 }

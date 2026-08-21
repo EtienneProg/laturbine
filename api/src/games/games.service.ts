@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { EloService } from '../elo/elo.service';
+import { EloService, PlayerEloInput } from '../elo/elo.service';
 import { AchievementsService } from '../achievements/achievements.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { SetResultDuelDto } from './dto/set-result-duel.dto';
@@ -123,13 +123,17 @@ export class GamesService {
       throw new BadRequestException('Équipe introuvable');
     }
 
-    const winnerPlayers = winnerTeam.players.map((tp: any) => ({
-      id: tp.player.id,
-      elo: tp.player.elo,
-    }));
+    const winnerPlayers: PlayerEloInput[] = winnerTeam.players.map(
+      (tp: any) => ({
+        id: tp.player.id,
+        elo: tp.player.elo,
+        nbMatch: tp.player.wins + tp.player.losses,
+      }),
+    );
     const loserPlayers = loserTeam.players.map((tp: any) => ({
       id: tp.player.id,
       elo: tp.player.elo,
+      nbMatch: tp.player.wins + tp.player.losses,
     }));
 
     const eloResults = this.eloService.calculate(winnerPlayers, loserPlayers);
@@ -195,10 +199,15 @@ export class GamesService {
 
     const vampireTeam = game.teams.find((t: any) => t.name === 'Vampires');
     const villagerTeam = game.teams.find((t: any) => t.name === 'Villageois');
+    const winningTeam = dto.winner === 'vampires' ? vampireTeam : villagerTeam;
 
     await this.prisma.game.update({
       where: { id },
-      data: { status: GameStatus.FINISHED, finishedAt: new Date() },
+      data: {
+        status: GameStatus.FINISHED,
+        finishedAt: new Date(),
+        winnerTeamId: winningTeam?.id ?? null,
+      },
     });
 
     if (dto.winner === 'vampires') {
@@ -241,9 +250,25 @@ export class GamesService {
       throw new BadRequestException('Cette game est déjà terminée');
     }
 
+    // Crée une team "Survivants" regroupant tous les gagnants —
+    // même mécanisme que winnerTeamId pour DUEL, pas de champ dédié
+    const winnerTeam = await this.prisma.team.create({
+      data: {
+        name: 'Survivants',
+        gameId: id,
+        players: {
+          create: dto.winnerPlayerIds.map((playerId) => ({ playerId })),
+        },
+      },
+    });
+
     await this.prisma.game.update({
       where: { id },
-      data: { status: GameStatus.FINISHED, finishedAt: new Date() },
+      data: {
+        status: GameStatus.FINISHED,
+        finishedAt: new Date(),
+        winnerTeamId: winnerTeam.id,
+      },
     });
 
     for (const playerId of dto.winnerPlayerIds) {

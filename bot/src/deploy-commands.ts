@@ -1,18 +1,17 @@
-import 'dotenv/config';
 import { REST, Routes } from 'discord.js';
 import { pingCommand } from './commands/ping';
 import { leaderboardCommand } from './commands/leaderboard';
-import { messtatsCommand } from './commands/messtats';
+import {profileCommand} from "./commands/profile";
 
 const commands = [
     pingCommand.data.toJSON(),
     leaderboardCommand.data.toJSON(),
-    messtatsCommand.data.toJSON(),
+    profileCommand.data.toJSON(),
 ];
 
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
+export async function deployCommands(): Promise<void> {
+    const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
 
-(async () => {
     try {
         console.log('🔄 Déploiement des commandes slash...');
 
@@ -26,6 +25,11 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
 
         console.log(`✅ ${commands.length} commande(s) déployée(s) avec succès !`);
     } catch (err) {
-        console.error('❌ Erreur lors du déploiement:', err);
+        console.error('❌ Erreur lors du déploiement des commandes:', err);
     }
-})();
+}
+
+// Permet de continuer à l'exécuter manuellement : npx ts-node src/deploy-commands.ts
+if (require.main === module) {
+    void deployCommands();
+}

@@ -3,25 +3,31 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerService } from '../../../../core/services/player.service';
 import { PlayerStats } from '../../../../core/models/player.model';
-import {FormsModule} from '@angular/forms';
-import {PlayerAchievementsComponent} from '../player-achievements/player-achievements.component';
-import {AchievementService} from '../../../../core/services/achievement.service';
-import {Achievement} from '../../../../core/models/achievement.model';
+import { FormsModule } from '@angular/forms';
+import { PlayerAchievementsComponent } from '../player-achievements/player-achievements.component';
+import { AchievementService } from '../../../../core/services/achievement.service';
+import { BadgeService } from '../../../../core/services/badge.service';
+import { Achievement } from '../../../../core/models/achievement.model';
+import { Badge } from '../../../../core/models/badge.model';
+import {PlayerBadgesComponent} from '../player-badges/player-badges.component';
 
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule, PlayerAchievementsComponent],
+  imports: [CommonModule, DatePipe, FormsModule, PlayerAchievementsComponent, PlayerBadgesComponent],
   templateUrl: './player-detail.component.html',
 })
 export class PlayerDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private playerService = inject(PlayerService);
-  private achievementService  = inject(AchievementService);
+  private achievementService = inject(AchievementService);
+  private badgeService = inject(BadgeService);
 
   player = signal<PlayerStats | null>(null);
   achievements = signal<Achievement[]>([]);
+  badges = signal<Badge[]>([]);
+  activeTab = signal<'achievements' | 'badges'>('achievements');
   loading = signal(true);
   showEloEdit = signal(false);
   newElo = signal(0);
@@ -32,8 +38,11 @@ export class PlayerDetailComponent implements OnInit {
       this.player.set(p);
       this.loading.set(false);
     });
-    this.achievementService.getPlayerAchievements(id).subscribe(a => {
+    this.achievementService.getPlayerAchievements(id).subscribe((a) => {
       this.achievements.set(a);
+    });
+    this.badgeService.getPlayerBadges(id).subscribe((b) => {
+      this.badges.set(b);
     });
   }
 
@@ -62,7 +71,7 @@ export class PlayerDetailComponent implements OnInit {
     const p = this.player();
     if (!p) return;
     this.achievementService.manualIncrement(p.id, key).subscribe(() => {
-      this.achievementService.getPlayerAchievements(p.id).subscribe(a => {
+      this.achievementService.getPlayerAchievements(p.id).subscribe((a) => {
         this.achievements.set(a);
       });
     });
@@ -72,7 +81,7 @@ export class PlayerDetailComponent implements OnInit {
     const p = this.player();
     if (!p) return;
     this.achievementService.manualUnlock(p.id, key).subscribe(() => {
-      this.achievementService.getPlayerAchievements(p.id).subscribe(a => {
+      this.achievementService.getPlayerAchievements(p.id).subscribe((a) => {
         this.achievements.set(a);
       });
     });

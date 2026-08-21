@@ -126,7 +126,7 @@ export class SessionsService {
       // Mise à jour du profil à chaque inscription
       player = await this.prisma.player.update({
         where: { discordId },
-        data: { discordTag, name: displayName, avatarUrl },
+        data: { discordTag, name: displayName, avatarUrl, isActive: true },
       });
     }
 
@@ -156,7 +156,14 @@ export class SessionsService {
       throw new BadRequestException('Cette session est clôturée');
     }
 
-    const result = this.prisma.registration.upsert({
+    // Réactive le joueur quel que soit le chemin d'inscription
+    // (bot Discord OU inscription manuelle admin par playerId)
+    await this.prisma.player.update({
+      where: { id: playerId },
+      data: { isActive: true },
+    });
+
+    const result = await this.prisma.registration.upsert({
       where: { playerId_sessionId: { playerId, sessionId } },
       create: { playerId, sessionId },
       update: {},

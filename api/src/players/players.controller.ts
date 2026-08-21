@@ -29,9 +29,9 @@ export class PlayersController {
     return this.playersService.findOne(id);
   }
 
-  @Get('discord/:discordId')
+  @Get('discord/:discordId/profile')
   findByDiscordId(@Param('discordId') discordId: string) {
-    return this.playersService.findByDiscordId(discordId);
+    return this.playersService.findProfileByDiscordId(discordId);
   }
 
   @Post()
@@ -47,5 +47,12 @@ export class PlayersController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.playersService.delete(id);
+  }
+
+  @Get(':id/badges')
+  async getPlayerBadges(@Param('id') id: string) {
+    const playerId = Number(id);
+
+    return this.playersService.getBadges(playerId);
   }
 }

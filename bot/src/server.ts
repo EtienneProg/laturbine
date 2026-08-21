@@ -77,7 +77,7 @@ export function startServer(client: BotClient): void {
     app.post('/announce-duel/:id', async (req, res) => {
         try {
             const duelId  = Number(req.params.id);
-            const duel    = await apiService.getDuel(duelId) as any;
+            const duel    = await apiService.getGame(duelId) as any;
 
             const channel = await client.channels.fetch(
                 process.env.CHANNEL_DUELS!
@@ -98,7 +98,7 @@ export function startServer(client: BotClient): void {
     app.post('/announce-result/:id', async (req, res) => {
         try {
             const duelId = Number(req.params.id);
-            const duel   = await apiService.getDuel(duelId) as any;
+            const duel   = await apiService.getGame(duelId) as any;
 
             // Récupère le message existant du duel
             const messages = await apiService.getActiveMessages() as any[];
@@ -127,6 +127,52 @@ export function startServer(client: BotClient): void {
             res.json({ success: true });
         } catch (err: any) {
             console.error('Erreur announce-result:', err);
+            res.status(500).json({ message: err.message });
+        }
+    });
+
+    app.post('/announce-result/vampire/:id', async (req, res) => {
+        try {
+            const game = await apiService.getGame(Number(req.params.id)) as any;
+            const channel = await client.channels.fetch(process.env.CHANNEL_RESULTS!) as TextChannel;
+            await channel.send(embedService.vampireResult(game));
+            res.json({ success: true });
+        } catch (err: any) {
+            res.status(500).json({ message: err.message });
+        }
+    });
+
+    app.post('/announce-result/hunger-games/:id', async (req, res) => {
+        try {
+            const game = await apiService.getGame(Number(req.params.id)) as any;
+            const channel = await client.channels.fetch(process.env.CHANNEL_RESULTS!) as TextChannel;
+            await channel.send(embedService.hungerGamesResult(game));
+            res.json({ success: true });
+        } catch (err: any) {
+            res.status(500).json({ message: err.message });
+        }
+    });
+
+    // Annonce achievement débloqué
+    // Reçoit directement les données nécessaires (pas de rappel API)
+    app.post('/announce-achievement', async (req, res) => {
+        try {
+            const { playerName, achievement } = req.body;
+
+            if (!playerName || !achievement?.name) {
+                res.status(400).json({ message: 'playerName et achievement.name requis' });
+                return;
+            }
+
+            const channel = await client.channels.fetch(
+                process.env.CHANNEL_ACHIEVEMENTS ?? process.env.CHANNEL_RESULTS!
+            ) as TextChannel;
+
+            await channel.send(embedService.achievementUnlocked(playerName, achievement));
+
+            res.json({ success: true });
+        } catch (err: any) {
+            console.error('Erreur announce-achievement:', err);
             res.status(500).json({ message: err.message });
         }
     });

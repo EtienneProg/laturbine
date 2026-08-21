@@ -34,10 +34,11 @@ model Player {
   name       String
   discordId  String   @unique
   discordTag String   @unique
-  elo        Int      @default(1500)
+  elo        Int      @default(1000)
   wins       Int      @default(0) // uniquement duels
   losses     Int      @default(0) // uniquement duels
   avatarUrl  String?
+  isActive   Boolean  @default(true) // false après clôture de saison, repasse true à l'inscription sur une session
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -45,6 +46,8 @@ model Player {
   eloHistory    EloHistory[]
   teamPlayers   TeamPlayer[]
   achievements  PlayerAchievement[]
+  seasonStats   SeasonPlayerStats[]
+  badges        PlayerBadge[]
 }
 
 // ─────────────────────────────────────────
@@ -168,6 +171,76 @@ model DiscordMessage {
   createdAt DateTime @default(now())
 
   @@unique([type, refId])
+}
+
+// ─────────────────────────────────────────
+// Saisons
+// ─────────────────────────────────────────
+
+model Season {
+  id        Int       @id @default(autoincrement())
+  number    Int       @unique // 1, 2, 3...
+  label     String? // ex: "Saison 2026 - Été", optionnel
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  isActive  Boolean   @default(false)
+
+  // Dump JSON complet pris à la clôture de la saison
+  // (players, achievements débloqués, elo history, games si besoin, etc.)
+  rawExport Json?
+
+  playerStats SeasonPlayerStats[]
+  badges      Badge[]
+
+  @@index([isActive])
+}
+
+model SeasonPlayerStats {
+  id       Int @id @default(autoincrement())
+  seasonId Int
+  playerId Int
+
+  season Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  finalElo             Int
+  wins                 Int
+  losses               Int
+  achievementsUnlocked Int // nb d'achievements débloqués pendant cette saison
+  rank                 Int? // classement final (calculé à la clôture, optionnel)
+
+  createdAt DateTime @default(now())
+
+  @@unique([seasonId, playerId])
+}
+
+// ─────────────────────────────────────────
+// Badges (récompenses de fin de saison)
+// ─────────────────────────────────────────
+
+model Badge {
+  id          Int    @id @default(autoincrement())
+  key         String @unique // ex: "SEASON_1_PARTICIPANT", "SEASON_1_TOP1"
+  name        String
+  description String
+  icon        String
+
+  seasonId Int?
+  season   Season? @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  playerBadges PlayerBadge[]
+}
+
+model PlayerBadge {
+  id        Int      @id @default(autoincrement())
+  awardedAt DateTime @default(now())
+
+  playerId Int
+  badgeId  Int
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  badge    Badge  @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, badgeId])
 }
 
 // ─────────────────────────────────────────

@@ -9,6 +9,7 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { EloModule } from './elo/elo.module';
 import { GamesModule } from './games/games.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { PublicModule } from './public/public.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     LeaderboardModule,
     EloModule,
     AchievementsModule,
+    PublicModule,
   ],
 })
 export class AppModule {}

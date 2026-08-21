@@ -41,7 +41,7 @@ async function restoreActiveMessages(client: BotClient): Promise<void> {
                     await apiService.getSession(msg.refId);
                     stillExists = true;
                 } else if (msg.type === 'duel') {
-                    await apiService.getDuel(msg.refId);
+                    await apiService.getGame(msg.refId);
                     stillExists = true;
                 }
             } catch {

@@ -1,0 +1,42 @@
+<div class="bg-card border border-border rounded-2xl p-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="font-display text-sm text-purple tracking-widest uppercase">
+      🎖️ Badges
+    </h2>
+    <span class="font-display text-xs text-muted">
+      {{ badges.length }} badge(s)
+    </span>
+  </div>
+
+  @if (badges.length === 0) {
+    <p class="text-muted text-sm font-body text-center py-10">
+      Aucun badge pour l'instant
+    </p>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+      @for (b of badges; track b.key) {
+        <div class="flex items-center gap-4 p-3 rounded-xl border bg-purple/5 border-purple/30 transition-all">
+
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border bg-purple/10 border-purple/30">
+            {{ b.icon }}
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="font-body text-sm font-semibold text-white">{{ b.name }}</div>
+            <div class="text-muted text-xs font-body">{{ b.description }}</div>
+            <div class="flex items-center gap-2 mt-1">
+              @if (b.seasonNumber) {
+                <span class="text-purple text-xs font-body">Saison {{ b.seasonNumber }}</span>
+              }
+              <span class="text-muted text-xs font-body">{{ b.awardedAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

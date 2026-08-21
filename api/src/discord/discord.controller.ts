@@ -61,4 +61,14 @@ export class DiscordController {
   announceResult(@Param('id', ParseIntPipe) id: number) {
     return this.discordService.announceResult(id);
   }
+
+  @Post('announce-result/vampire/:id')
+  announceVampireResult(@Param('id', ParseIntPipe) id: number) {
+    return this.discordService.announceVampireResult(id);
+  }
+
+  @Post('announce-result/hunger-games/:id')
+  announceHungerGamesResult(@Param('id', ParseIntPipe) id: number) {
+    return this.discordService.announceHungerGamesResult(id);
+  }
 }

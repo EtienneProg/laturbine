@@ -57,10 +57,10 @@ export const apiService = {
     getLeaderboard: () =>
         request('GET', '/leaderboard'),
 
-    // Joueur par discord ID
-    getPlayerByDiscordId: (discordId: string) =>
-        request('GET', `/players/discord/${discordId}`),
+    // Profil complet du joueur (stats saison en cours + achievements débloqués)
+    getPlayerProfileByDiscordId: (discordId: string) =>
+        request('GET', `/players/discord/${discordId}/profile`),
 
-    getDuel: (id: number) =>
+    getGame: (id: number) =>
         request('GET', `/games/${id}`),
 };

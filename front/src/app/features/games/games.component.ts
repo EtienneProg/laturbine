@@ -50,7 +50,9 @@ export class GamesComponent implements OnInit {
   onCreate(payload: CreateGamePayload): void {
     this.gameService.create(payload).subscribe(game => {
       this.games.update(g => [game, ...g]);
-      this.discordService.announceDuel(game.id).subscribe();
+      if (game.gameMode.key === "DUEL") {
+        this.discordService.announceDuel(game.id).subscribe();
+      }
       this.showCreate.set(false);
     });
   }
@@ -74,6 +76,7 @@ export class GamesComponent implements OnInit {
     if (!game) return;
     this.gameService.setResultVampire(game.id, payload).subscribe(updated => {
       this.games.update(list => list.map(g => g.id === updated.id ? updated : g));
+      this.discordService.announceVampireResult(game.id).subscribe();
       this.gameToResult.set(null);
     });
   }
@@ -83,6 +86,7 @@ export class GamesComponent implements OnInit {
     if (!game) return;
     this.gameService.setResultHungerGames(game.id, payload).subscribe(updated => {
       this.games.update(list => list.map(g => g.id === updated.id ? updated : g));
+      this.discordService.announceHungerGamesResult(game.id).subscribe();
       this.gameToResult.set(null);
     });
   }

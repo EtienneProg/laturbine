@@ -4,17 +4,35 @@ import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.compone
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'public/leaderboard',
+    pathMatch: 'full',
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login.component')
       .then(m => m.LoginComponent),
   },
+
+  // ─────────────────────────────────────────
+  // Public — pas d'authGuard
+  // ─────────────────────────────────────────
   {
     path: 'public/leaderboard',
-    loadComponent: () => import('./features/public/public-leaderboard.component')
+    loadComponent: () => import('./features/public/public-leaderboard/public-leaderboard.component')
       .then(m => m.PublicLeaderboardComponent),
   },
   {
-    path: '',
+    path: 'public/players/:id',
+    loadComponent: () => import('./features/public/public-player-profile/public-player-profile.component')
+      .then(m => m.PublicPlayerProfileComponent),
+  },
+
+  // ─────────────────────────────────────────
+  // Admin — protégé par authGuard
+  // ─────────────────────────────────────────
+  {
+    path: 'admin',
     component: AdminLayoutComponent,
     canActivate: [authGuard],
     children: [

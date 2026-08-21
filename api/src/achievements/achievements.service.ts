@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { DiscordService } from '../discord/discord.service';
+import { Achievement } from '@prisma/client';
 
 @Injectable()
 export class AchievementsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private discordService: DiscordService,
+  ) {}
 
   // ─────────────────────────────────────────
   // Récupère tous les achievements d'un joueur
@@ -116,6 +121,15 @@ export class AchievementsService {
     });
     if (!achievement) return;
 
+    const existing = await this.prisma.playerAchievement.findUnique({
+      where: {
+        playerId_achievementId: { playerId, achievementId: achievement.id },
+      },
+    });
+
+    // Déjà débloqué → on ne touche à rien et on ne refire pas la commande
+    if (existing?.unlockedAt) return;
+
     await this.prisma.playerAchievement.upsert({
       where: {
         playerId_achievementId: { playerId, achievementId: achievement.id },
@@ -128,6 +142,8 @@ export class AchievementsService {
       },
       update: { unlockedAt: new Date() },
     });
+
+    await this.onAchievementUnlocked(playerId, achievement);
   }
 
   // ─────────────────────────────────────────
@@ -158,11 +174,13 @@ export class AchievementsService {
       update: { progress: { increment: 1 } },
     });
 
-    // Débloque si threshold atteint
+    const alreadyUnlocked = !!current.unlockedAt;
+
+    // Débloque si threshold atteint ET pas déjà débloqué
     if (
       achievement.threshold !== null &&
       current.progress >= achievement.threshold &&
-      !current.unlockedAt
+      !alreadyUnlocked
     ) {
       await this.prisma.playerAchievement.update({
         where: {
@@ -170,6 +188,9 @@ export class AchievementsService {
         },
         data: { unlockedAt: new Date() },
       });
+
+      // On ne passe ici QUE lors de la transition verrouillé → débloqué
+      await this.onAchievementUnlocked(playerId, achievement);
     }
   }
 
@@ -201,7 +222,9 @@ export class AchievementsService {
       where: { playerId_achievementId: { playerId, achievementId } },
     });
 
+    const wasAlreadyUnlocked = !!existing?.unlockedAt;
     const shouldUnlock = currentValue >= threshold;
+    const isNewlyUnlocked = shouldUnlock && !wasAlreadyUnlocked;
 
     await this.prisma.playerAchievement.upsert({
       where: { playerId_achievementId: { playerId, achievementId } },
@@ -213,12 +236,34 @@ export class AchievementsService {
       },
       update: {
         progress: currentValue,
-        unlockedAt:
-          shouldUnlock && !existing?.unlockedAt
-            ? new Date()
-            : existing?.unlockedAt,
+        unlockedAt: isNewlyUnlocked ? new Date() : existing?.unlockedAt,
       },
     });
+
+    // On ne fire la commande QUE si on vient de passer de non-débloqué à débloqué,
+    // que ce soit à la création de la ligne ou à sa mise à jour.
+    if (isNewlyUnlocked) {
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { id: achievementId },
+      });
+      if (achievement) {
+        await this.onAchievementUnlocked(playerId, achievement);
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // Hook central — appelé UNE SEULE FOIS,
+  // exactement au moment du déblocage.
+  // ─────────────────────────────────────────
+  private async onAchievementUnlocked(
+    playerId: number,
+    achievement: Achievement,
+  ) {
+    await this.discordService.announceAchievementUnlocked(
+      playerId,
+      achievement,
+    );
   }
 
   async getGrades() {

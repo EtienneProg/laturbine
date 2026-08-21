@@ -1,18 +1,18 @@
 import {
   Component, inject, OnInit, OnDestroy,
-  signal, QueryList, ViewChildren, AfterViewInit
+  signal, QueryList, ViewChildren
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription, timer } from 'rxjs';
-import { LeaderboardService } from '../../core/services/leaderboard.service';
-import { AchievementService } from '../../core/services/achievement.service';
-import { ApiService } from '../../core/services/api.service';
-import { Player } from '../../core/models/player.model';
-import { Game } from '../../core/models/game.model';
 import { LbPlayerRowComponent } from './components/lb-player-row/lb-player-row.component';
 import { LbEmptyRowComponent } from './components/lb-empty-row/lb-empty-row.component';
 import { LbDuelSlotComponent, DuelSlotData } from './components/lb-duel-slot/lb-duel-slot.component';
 import {LbNeonFrameComponent} from './components/lb-neon-frame/lb-neon-frame.component';
+import { LeaderboardService } from '../../../core/services/leaderboard.service';
+import { AchievementService } from '../../../core/services/achievement.service';
+import { ApiService } from '../../../core/services/api.service';
+import { Player } from '../../../core/models/player.model';
+import { Game } from '../../../core/models/game.model';
 
 interface DuelSlot extends DuelSlotData {
   game: Game;

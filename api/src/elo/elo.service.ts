@@ -7,12 +7,18 @@ export interface EloResult {
   delta: number;
 }
 
+export interface PlayerEloInput {
+  id: number;
+  elo: number;
+  nbMatch: number;
+}
+
 @Injectable()
 export class EloService {
   // winnerElos / loserElos = tableaux des ELOs actuels de chaque équipe
   calculate(
-    winnerPlayers: { id: number; elo: number }[],
-    loserPlayers: { id: number; elo: number }[],
+    winnerPlayers: PlayerEloInput[],
+    loserPlayers: PlayerEloInput[],
   ): EloResult[] {
     const winnerAvg = this.teamAvgElo(winnerPlayers.map((p) => p.elo));
     const loserAvg = this.teamAvgElo(loserPlayers.map((p) => p.elo));
@@ -23,7 +29,7 @@ export class EloService {
     for (const player of winnerPlayers) {
       const k = this.getKFactor(player.elo);
       const expected = this.expectedScore(player.elo, loserAvg);
-      const delta = Math.round(k * (1 - expected));
+      const delta = Math.round(k * (1 - expected + 1));
       const eloAfter = player.elo + delta;
 
       results.push({
@@ -38,7 +44,7 @@ export class EloService {
     for (const player of loserPlayers) {
       const k = this.getKFactor(player.elo);
       const expected = this.expectedScore(player.elo, winnerAvg);
-      const delta = Math.round(k * (0 - expected));
+      const delta = Math.min(Math.round(k * (0 - expected)), -1);
       const eloAfter = Math.max(100, player.elo + delta); // ELO minimum = 100
 
       results.push({
@@ -52,12 +58,12 @@ export class EloService {
     return results;
   }
 
-  // K-factor selon le niveau du joueur
-  private getKFactor(elo: number): number {
-    if (elo < 1400) return 40; // Débutant — variations importantes
-    if (elo < 1600) return 32; // Intermédiaire
-    if (elo < 1800) return 24; // Confirmé
-    return 16; // Elite — variations plus faibles
+  // K-factor selon le nb de match du joueur
+  private getKFactor(nbMatch: number): number {
+    if (nbMatch < 10) return 60;
+    if (nbMatch < 20) return 50;
+    if (nbMatch < 30) return 40;
+    return 32;
   }
 
   // Probabilité de victoire attendue

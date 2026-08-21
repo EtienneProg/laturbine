@@ -85,16 +85,14 @@ export class PlayersService {
     return updated;
   }
 
-  async findByDiscordId(discordId: string) {
+  async findProfileByDiscordId(discordId: string) {
     const player = await this.prisma.player.findUnique({
       where: { discordId },
       include: {
-        eloHistory: {
-          orderBy: { createdAt: 'desc' },
-          take: 50,
-        },
         achievements: {
+          where: { unlockedAt: { not: null } },
           include: { achievement: true },
+          orderBy: { unlockedAt: 'desc' },
         },
       },
     });
@@ -104,18 +102,51 @@ export class PlayersService {
         `Joueur avec Discord ID ${discordId} introuvable`,
       );
 
-    const rank = await this.prisma.player.count({
+    const higherEloCount = await this.prisma.player.count({
       where: { elo: { gt: player.elo } },
     });
 
     const total = player.wins + player.losses;
     const winRate = total === 0 ? 0 : Math.round((player.wins / total) * 100);
 
-    return { ...player, rank: rank + 1, winRate };
+    return {
+      id: player.id,
+      name: player.name,
+      discordId: player.discordId,
+      discordTag: player.discordTag,
+      avatarUrl: player.avatarUrl,
+      elo: player.elo,
+      wins: player.wins,
+      losses: player.losses,
+      rank: higherEloCount + 1,
+      winRate,
+      achievements: player.achievements.map((pa) => ({
+        key: pa.achievement.key,
+        name: pa.achievement.name,
+        icon: pa.achievement.icon,
+      })),
+    };
   }
 
   async delete(id: number) {
     await this.findOne(id);
     return this.prisma.player.delete({ where: { id } });
+  }
+
+  async getBadges(playerId: number) {
+    const playerBadges = await this.prisma.playerBadge.findMany({
+      where: { playerId },
+      include: { badge: { include: { season: true } } },
+      orderBy: { awardedAt: 'desc' },
+    });
+
+    return playerBadges.map((pb) => ({
+      key: pb.badge.key,
+      name: pb.badge.name,
+      description: pb.badge.description,
+      icon: pb.badge.icon,
+      seasonNumber: pb.badge.season?.number ?? null,
+      awardedAt: pb.awardedAt,
+    }));
   }
 }
